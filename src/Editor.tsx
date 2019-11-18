@@ -1,4 +1,4 @@
-import { centroid as cent, polygon } from "@turf/turf";
+import { booleanContains, centroid as cent, polygon } from "@turf/turf";
 import ClipperLib from "clipper-fpoint";
 import * as React from "react";
 import { Canvas, extend, useThree } from "react-three-fiber";
@@ -11,12 +11,18 @@ import { useStore } from "./store";
 extend({ OrbitControls });
 extend({ DragControls });
 
+let changeControls;
+let outline;
+
 const Controls: React.FC = () => {
   const [enabled, setEnabled] = React.useState(true);
+
+  changeControls = bool => setEnabled(bool);
+
   const controls = React.useRef(null);
   const { camera, gl } = useThree();
 
-  if (!enabled) return null;
+  // if (!enabled) return null;
 
   // setTimeout(() => setEnabled(false), 1000);
 
@@ -34,6 +40,7 @@ const Controls: React.FC = () => {
       zoomSpeed={0.8}
       // minPolarAngle={0.5}
       maxPolarAngle={1.2}
+      enabled={enabled}
     />
   );
 };
@@ -89,6 +96,9 @@ const Outline: React.FC = () => {
     );
     co.Execute(solution, -1);
 
+    outline = polygon([cartesian]);
+    console.log({ outline });
+
     return [
       cartesian.map(
         // const vertices = [...shape, shape[0]].map(
@@ -133,7 +143,7 @@ const Dragger = ({ objects }) => {
   return <dragControls ref={ref} args={[objects, camera, gl.domElement]} />;
 };
 
-function Thing() {
+function Building() {
   // const ref = React.useRef(null);
 
   const [objects, setObjects] = React.useState(null);
@@ -169,11 +179,15 @@ function Thing() {
         position={position}
         // {...(bind() as any)}
         ref={ref}
-        onPointerDown={e => (dragging = true)}
+        onPointerDown={e => {
+          changeControls(false);
+          dragging = true;
+        }}
+        userData={{ setPosition }}
         // onPointerOver={e => console.log("hover")}
         // onPointerOut={e => console.log("unhover")}
       >
-        <boxBufferGeometry attach="geometry" args={[1, 1, 1]} />
+        <boxGeometry attach="geometry" args={[1, 1, 1]} />
         <meshNormalMaterial attach="material" />
       </mesh>
       {/* {objects && <Dragger objects={objects} />} */}
@@ -204,7 +218,25 @@ const MoveControls = ({ objects }) => {
       raycaster.setFromCamera(mouse, camera);
 
       raycaster.ray.intersectPlane(plane, intersects);
-      objects[0].position.copy(intersects);
+
+      const { x, y, z } = intersects;
+
+      const p = [
+        [x - 0.5, z - 0.5],
+        [x + 0.5, z - 0.5],
+        [x + 0.5, z + 0.5],
+        [x - 0.5, z + 0.5],
+        [x - 0.5, z - 0.5]
+      ];
+
+      if (booleanContains(outline, polygon([p]))) {
+        objects[0].material.opacity = 1;
+      } else {
+        objects[0].material.opacity = 0.7;
+      }
+
+      // objects[0].position.copy(intersects);
+      objects[0].userData.setPosition([x, y, z]);
 
       // normalMatrix.getNormalMatrix(intersects[0].object.matrixWorld);
       // worldNormal.copy(intersects[0].face.normal).applyMatrix3(normalMatrix).normalize();
@@ -213,6 +245,7 @@ const MoveControls = ({ objects }) => {
     }
 
     function onMouseUp() {
+      changeControls(true);
       dragging = false;
     }
 
@@ -253,7 +286,7 @@ const Editor: React.FC<{ location: any }> = ({ location }) => {
         }}
       >
         <Outline />
-        <Thing />
+        <Building />
         <Controls />
       </Canvas>
     </div>
