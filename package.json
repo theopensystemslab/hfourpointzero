@@ -2,6 +2,7 @@
   "name": "hfourpointzero",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://h40.netlify.com",
   "dependencies": {
     "@mapbox/mapbox-gl-draw": "^1.1.2",
     "@turf/turf": "^5.1.6",
