@@ -2,7 +2,6 @@ import { booleanContains, centroid as cent, polygon } from "@turf/turf";
 import ClipperLib from "clipper-fpoint";
 import * as React from "react";
 import { Canvas, extend, useThree } from "react-three-fiber";
-import { useDrag } from "react-use-gesture";
 import * as THREE from "three";
 import { DragControls } from "three/examples/jsm/controls/DragControls";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
@@ -13,6 +12,8 @@ extend({ DragControls });
 
 let changeControls;
 let outline;
+let dragging = false;
+let rotating = false;
 
 const Controls: React.FC = () => {
   const [enabled, setEnabled] = React.useState(true);
@@ -41,6 +42,8 @@ const Controls: React.FC = () => {
       // minPolarAngle={0.5}
       maxPolarAngle={1.2}
       enabled={enabled}
+      minDistance={4}
+      maxDistance={50}
     />
   );
 };
@@ -125,22 +128,13 @@ const Outline: React.FC = () => {
   );
 };
 
-let dragging = false;
-
-const Dragger = ({ objects }) => {
-  const { camera, gl } = useThree();
-
-  const ref = React.useCallback(node => {
-    if (node !== null) {
-      node.addEventListener("drag", function(event) {
-        event.object.position.y = 0;
-        // console.log(event);
-        // event.object.material.emissive.set( 0xaaaaaa );
-      });
-    }
-  }, []);
-
-  return <dragControls ref={ref} args={[objects, camera, gl.domElement]} />;
+const CircularGrid = () => {
+  return (
+    <polarGridHelper
+      args={[1, 16, 2, 16, 0xcccccc, 0xcccccc]}
+      position={new THREE.Vector3(0, -0.5, 0)}
+    />
+  );
 };
 
 function Building() {
@@ -148,6 +142,7 @@ function Building() {
 
   const [objects, setObjects] = React.useState(null);
   const [position, setPosition] = React.useState([0, 0, 0]);
+  const [rotation, setRotation] = React.useState(0);
   const { size, viewport, camera, gl } = useThree();
   const aspect = size.width / viewport.width;
 
@@ -158,14 +153,14 @@ function Building() {
     }
   }, []);
 
-  const bind = useDrag(
-    ({ offset, vxvy }) => {
-      console.log(vxvy);
-      // const [offset[0], 0, offset[]] = position;
-      setPosition([offset[0] / aspect, 0, offset[1] / aspect]);
-    },
-    { pointerEvents: true }
-  );
+  // const bind = useDrag(
+  //   ({ offset, vxvy }) => {
+  //     console.log(vxvy);
+  //     // const [offset[0], 0, offset[]] = position;
+  //     setPosition([offset[0] / aspect, 0, offset[1] / aspect]);
+  //   },
+  //   { pointerEvents: true }
+  // );
 
   // controlsRef.current &&
   //   controlsRef.current.addEventListener("dragstart", function(event) {
@@ -175,21 +170,30 @@ function Building() {
 
   return (
     <>
-      <mesh
-        position={position}
-        // {...(bind() as any)}
-        ref={ref}
-        onPointerDown={e => {
-          changeControls(false);
-          dragging = true;
-        }}
-        userData={{ setPosition }}
-        // onPointerOver={e => console.log("hover")}
-        // onPointerOut={e => console.log("unhover")}
-      >
-        <boxGeometry attach="geometry" args={[1, 1, 1]} />
-        <meshNormalMaterial attach="material" />
-      </mesh>
+      <group position={position} rotation={[0, rotation, 0]}>
+        <mesh
+          // {...(bind() as any)}
+          ref={ref}
+          onPointerDown={e => {
+            changeControls(false);
+            dragging = true;
+          }}
+          userData={{ setPosition, setRotation }}
+          // onPointerOver={e => console.log("hover")}
+          // onPointerOut={e => console.log("unhover")}
+        >
+          <boxGeometry attach="geometry" args={[1, 1, 1]} />
+          <meshNormalMaterial attach="material" />
+        </mesh>
+        <group
+          onPointerDown={e => {
+            changeControls(false);
+            rotating = true;
+          }}
+        >
+          <CircularGrid />
+        </group>
+      </group>
       {/* {objects && <Dragger objects={objects} />} */}
       {objects && <MoveControls objects={objects} />}
     </>
@@ -209,44 +213,50 @@ const MoveControls = ({ objects }) => {
     // const raycaster = new THREE.Raycaster();
 
     function onMouseMove(event) {
-      if (!dragging) return;
+      if (!dragging && !rotating) return;
 
       mouse.set(
         (event.clientX / window.innerWidth) * 2 - 1,
         -(event.clientY / window.innerHeight) * 2 + 1
       );
+
       raycaster.setFromCamera(mouse, camera);
 
-      raycaster.ray.intersectPlane(plane, intersects);
+      if (dragging) {
+        raycaster.ray.intersectPlane(plane, intersects);
 
-      const { x, y, z } = intersects;
+        const { x, y, z } = intersects;
 
-      const p = [
-        [x - 0.5, z - 0.5],
-        [x + 0.5, z - 0.5],
-        [x + 0.5, z + 0.5],
-        [x - 0.5, z + 0.5],
-        [x - 0.5, z - 0.5]
-      ];
+        const p = [
+          [x - 0.5, z - 0.5],
+          [x + 0.5, z - 0.5],
+          [x + 0.5, z + 0.5],
+          [x - 0.5, z + 0.5],
+          [x - 0.5, z - 0.5]
+        ];
 
-      if (booleanContains(outline, polygon([p]))) {
-        objects[0].material.opacity = 1;
-      } else {
-        objects[0].material.opacity = 0.7;
+        if (booleanContains(outline, polygon([p]))) {
+          objects[0].material.opacity = 1;
+        } else {
+          objects[0].material.opacity = 0.7;
+        }
+
+        // objects[0].position.copy(intersects);
+        objects[0].userData.setPosition([x, y, z]);
+
+        // normalMatrix.getNormalMatrix(intersects[0].object.matrixWorld);
+        // worldNormal.copy(intersects[0].face.normal).applyMatrix3(normalMatrix).normalize();
+        // _window.position.copy(intersects[0].point);
+        // _window.lookAt(lookAtVector.copy(intersects[0].point).add(worldNormal));
+      } else if (rotating) {
+        objects[0].userData.setRotation(mouse.x * 4);
       }
-
-      // objects[0].position.copy(intersects);
-      objects[0].userData.setPosition([x, y, z]);
-
-      // normalMatrix.getNormalMatrix(intersects[0].object.matrixWorld);
-      // worldNormal.copy(intersects[0].face.normal).applyMatrix3(normalMatrix).normalize();
-      // _window.position.copy(intersects[0].point);
-      // _window.lookAt(lookAtVector.copy(intersects[0].point).add(worldNormal));
     }
 
     function onMouseUp() {
       changeControls(true);
       dragging = false;
+      rotating = false;
     }
 
     window.addEventListener("mousemove", onMouseMove, false);
@@ -266,18 +276,6 @@ const MoveControls = ({ objects }) => {
 const Editor: React.FC<{ location: any }> = ({ location }) => {
   return (
     <div style={{ width: "100%", height: "100vh", position: "relative" }}>
-      <h1
-        style={{
-          position: "fixed",
-          top: 10,
-          left: 10,
-          color: "black",
-          margin: 0,
-          padding: 0
-        }}
-      >
-        Barcelona
-      </h1>
       <Canvas
         style={{ height: "100%" }}
         camera={{
@@ -289,6 +287,20 @@ const Editor: React.FC<{ location: any }> = ({ location }) => {
         <Building />
         <Controls />
       </Canvas>
+      <h1
+        style={{
+          position: "fixed",
+          top: 10,
+          left: 10,
+          color: "black",
+          margin: 0,
+          padding: 0,
+          userSelect: "none",
+          pointerEvents: "none"
+        }}
+      >
+        Carrer de Casp, Barcelona
+      </h1>
     </div>
   );
 };
