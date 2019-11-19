@@ -5,6 +5,9 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  background: #222;
+  color: #eee;
 }
 
 code {
@@ -19,4 +22,15 @@ code {
   position: fixed;
   bottom: 10px;
   z-index: 10000;
+}
+
+h1 {
+  color: #f5f5f5 !important;
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  pointer-events: none;
 }

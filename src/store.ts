@@ -17,6 +17,16 @@ export const [useStore] = create((set, get) => ({
       set({ selectedFeatureIndex: undefined });
     }
   },
+  buildings: [
+    {
+      position: [0, 0, 10],
+      modules: [[0, 0, 0]]
+    },
+    {
+      position: [0, 0, 0],
+      modules: [[0, 0, 0]]
+    }
+  ],
   // setViewport: viewport => set({ viewport }),
   setMap: map => set({ map }),
   setLocation: location => {
