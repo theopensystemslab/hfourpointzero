@@ -7,5 +7,9 @@ export const config = {
   MIN_LENGTH: 1,
   MIN_WIDTH: 3,
   MIN_HEIGHT: 1,
-  changeControls: undefined
+  changeControls: undefined,
+  objects: [],
+  activeObject: undefined,
+  mode: "GLOBAL",
+  clickTime: 0
 };

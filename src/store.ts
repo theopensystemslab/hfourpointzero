@@ -20,13 +20,40 @@ export const [useStore] = create((set, get) => ({
   buildings: [
     {
       position: [0, 0, 10],
-      modules: [[0, 0, 0]]
+      modules: [
+        [0, 0, 0],
+        [0, 1, 0],
+        [0, 0, 1],
+        [0, 0, -1],
+        [0, 1, -1],
+        [-1, 0, -1],
+        [-1, 0, 0],
+        [1, 0, -1],
+        [1, 0, 0]
+      ]
     },
     {
       position: [0, 0, 0],
-      modules: [[0, 0, 0]]
+      modules: [
+        [0, 0, 0],
+        [0, 0, 1],
+        [0, 0, -1],
+        [0, 0, 2],
+        [0, 0, -2]
+      ]
     }
   ],
+
+  addModule: (idx, position) => {
+    const { buildings } = get();
+    if (
+      !buildings[idx].modules.some(m => m.toString() === position.toString())
+    ) {
+      // set({ buildings: {...buildings} })
+      // set([...modules, position]);
+    }
+  },
+
   // setViewport: viewport => set({ viewport }),
   setMap: map => set({ map }),
   setLocation: location => {

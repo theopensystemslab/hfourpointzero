@@ -7,7 +7,7 @@ import { config } from "./_vars";
 
 extend({ DragControls });
 
-const MoveControls = ({ objects }) => {
+const MoveControls = () => {
   const { camera, raycaster } = useThree();
 
   React.useEffect(() => {
@@ -40,21 +40,23 @@ const MoveControls = ({ objects }) => {
         ];
 
         if (booleanContains(config.outline, polygon([p]))) {
-          objects[0].material.opacity = 1;
+          config.activeObject.material.opacity = 1;
         } else {
-          objects[0].material.opacity = 0.7;
+          config.activeObject.material.opacity = 0.7;
         }
 
         // objects[0].position.copy(intersects);
 
-        objects[0].userData.setPosition([x, y, z]);
+        config.activeObject.userData.setPosition([x, y, z]);
 
         // normalMatrix.getNormalMatrix(intersects[0].object.matrixWorld);
         // worldNormal.copy(intersects[0].face.normal).applyMatrix3(normalMatrix).normalize();
         // _window.position.copy(intersects[0].point);
         // _window.lookAt(lookAtVector.copy(intersects[0].point).add(worldNormal));
       } else if (config.rotating) {
-        objects[0].userData.setRotation(config.initialRotation + mouse.x * 4);
+        config.activeObject.userData.setRotation(
+          config.initialRotation + mouse.x * 4
+        );
       }
     }
 

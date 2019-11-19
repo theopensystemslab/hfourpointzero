@@ -1,16 +1,15 @@
 import intersectionBy from "lodash/intersectionBy";
 import * as React from "react";
 import "react-three-fiber";
-import { useThree } from "react-three-fiber";
 import * as THREE from "three";
+import shallow from "zustand/shallow";
+import { useStore } from "../store";
 import CircularGrid from "./CircularGrid";
-import MoveControls from "./MoveControls";
 import { config } from "./_vars";
 
 const extrude = e => {
-  return;
+  // return;
   if (!e.face) return;
-  console.log(e);
 
   const geometry = (e.eventObject as THREE.Mesh).geometry as THREE.Geometry;
 
@@ -38,51 +37,51 @@ const extrude = e => {
   addModule([newPosition.x, newPosition.y, newPosition.z]);
 };
 
-const Building: React.FC<any> = ({ position: p }) => {
-  // const ref = React.useRef(null);
+const geometry = new THREE.BoxGeometry(
+  config.GRID_SIZE * config.MIN_WIDTH,
+  config.GRID_SIZE * config.MIN_HEIGHT,
+  config.GRID_SIZE * config.MIN_LENGTH
+);
 
-  const [objects, setObjects] = React.useState(null);
-  const [position, setPosition] = React.useState(p);
+const material = new THREE.MeshBasicMaterial({ color: 0x000000 });
+
+const lineMaterial = new THREE.LineBasicMaterial({ color: 0xffffff });
+
+const Building: React.FC<any> = ({ idx }) => {
+  const ref = React.useRef(null);
+
+  const { building, addModule } = useStore(
+    state => ({ building: state.buildings[idx], addModule: state.addModule }),
+    shallow
+  );
+
+  const [position, setPosition] = React.useState(building.position);
   const [rotation, setRotation] = React.useState(0);
-  const { size, viewport, camera, gl } = useThree();
-  const [modules, setModules] = React.useState([[0, 0, 0]]);
-  const aspect = size.width / viewport.width;
 
-  const ref = React.useCallback(node => {
-    if (node !== null) {
-      setObjects([node]);
-    }
-  }, []);
+  // const geometry = React.useMemo(
+  //   () =>
+  //     new THREE.BoxGeometry(
+  //       config.GRID_SIZE * config.MIN_WIDTH,
+  //       config.GRID_SIZE * config.MIN_HEIGHT,
+  //       config.GRID_SIZE * config.MIN_LENGTH
+  //     ),
+  //   []
+  // );
 
-  const addModule = position => {
-    if (!modules.some(m => m.toString() === position.toString())) {
-      setModules([...modules, position]);
-    }
-  };
+  // const material = React.useMemo(
+  //   () => new THREE.MeshBasicMaterial({ color: 0x000000 }),
+  //   []
+  // );
 
-  const geometry = React.useMemo(
-    () =>
-      new THREE.BoxGeometry(
-        config.GRID_SIZE * config.MIN_WIDTH,
-        config.GRID_SIZE * config.MIN_HEIGHT,
-        config.GRID_SIZE * config.MIN_LENGTH
-      ),
-    []
-  );
-  const material = React.useMemo(
-    () => new THREE.MeshBasicMaterial({ color: 0x000000 }),
-    []
-  );
-
-  const lineMaterial = React.useMemo(
-    () => new THREE.LineBasicMaterial({ color: 0xffffff }),
-    []
-  );
+  // const lineMaterial = React.useMemo(
+  //   () => new THREE.LineBasicMaterial({ color: 0xffffff }),
+  //   []
+  // );
 
   return (
     <>
       <group position={position} rotation={[0, rotation, 0]}>
-        {modules.map(([x, y, z]) => {
+        {building.modules.map(([x, y, z]) => {
           const position = [
             x * (config.GRID_SIZE * config.MIN_WIDTH),
             y * (config.GRID_SIZE * config.MIN_HEIGHT),
@@ -90,13 +89,21 @@ const Building: React.FC<any> = ({ position: p }) => {
           ];
 
           return (
-            <>
+            <React.Fragment key={[x, y, z].join("-")}>
               <mesh
                 // {...(bind() as any)}
                 position={position}
-                onClick={extrude}
+                onClick={e => {
+                  if (Date.now() - config.clickTime < 300) {
+                    console.log("DOUBLE CLICK");
+                  } else {
+                    extrude(e);
+                  }
+                  config.clickTime = Date.now();
+                }}
                 ref={ref}
                 onPointerDown={e => {
+                  config.activeObject = ref.current;
                   config.changeControls(false);
                   config.dragging = true;
                 }}
@@ -104,7 +111,9 @@ const Building: React.FC<any> = ({ position: p }) => {
                   setPosition,
                   setRotation,
                   gridPosition: { x, y, z },
-                  addModule
+                  addModule: position => {
+                    addModule(idx, position);
+                  }
                 }}
                 geometry={geometry}
                 material={material}
@@ -114,7 +123,7 @@ const Building: React.FC<any> = ({ position: p }) => {
               <lineSegments position={position} material={lineMaterial}>
                 <edgesGeometry attach="geometry" args={[geometry]} />
               </lineSegments>
-            </>
+            </React.Fragment>
           );
         })}
 
@@ -122,6 +131,7 @@ const Building: React.FC<any> = ({ position: p }) => {
           onPointerDown={e => {
             config.changeControls(false);
             // console.log(e.eventObject.rotation.y);
+            config.activeObject = ref.current;
             config.initialRotation = e.object.parent.parent.rotation.y;
             config.rotating = true;
           }}
@@ -129,9 +139,6 @@ const Building: React.FC<any> = ({ position: p }) => {
           <CircularGrid />
         </group>
       </group>
-
-      {/* {objects && <Dragger objects={objects} />} */}
-      {objects && <MoveControls objects={objects} />}
     </>
   );
 };

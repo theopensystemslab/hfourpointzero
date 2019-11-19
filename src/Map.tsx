@@ -51,6 +51,7 @@ const Continue = () => {
   const area = getArea(poly);
 
   const ob = {
+    area,
     coordinates: coordinates[0],
     projected: coordinates[0].map(xy => map.project(xy)),
     zoom: map._context.viewport.zoom
