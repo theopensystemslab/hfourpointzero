@@ -1,5 +1,6 @@
 import { booleanContains, centroid as cent, polygon } from "@turf/turf";
 import ClipperLib from "clipper-fpoint";
+import intersectionBy from "lodash/intersectionBy";
 import * as React from "react";
 import { Canvas, extend, useThree } from "react-three-fiber";
 import * as THREE from "three";
@@ -14,6 +15,20 @@ let changeControls;
 let outline;
 let dragging = false;
 let rotating = false;
+let initialRotation = 0;
+
+// const GRID_SIZE = 1.2;
+// const MIN_LENGTH = 1;
+// const MIN_WIDTH = 4;
+// const MIN_HEIGHT = 2;
+
+// const GRID_WIDTH = 5;
+// const GRID_HEIGHT = 15;
+
+const GRID_SIZE = 1;
+const MIN_LENGTH = 1;
+const MIN_WIDTH = 1;
+const MIN_HEIGHT = 1;
 
 const Controls: React.FC = () => {
   const [enabled, setEnabled] = React.useState(true);
@@ -137,6 +152,35 @@ const CircularGrid = () => {
   );
 };
 
+const extrude = e => {
+  if (!e.face) return;
+
+  const geometry = (e.eventObject as THREE.Mesh).geometry as THREE.Geometry;
+
+  const v = geometry.vertices;
+
+  const faceVertices = [v[e.face.a], v[e.face.b], v[e.face.c]];
+
+  const axes = ["x", "y", "z"];
+  const common = axes.reduce((acc, curr) => {
+    if (intersectionBy(faceVertices, curr).length === 1) {
+      acc = curr;
+    }
+    return acc;
+  }, "");
+
+  const { gridPosition, addModule } = e.eventObject.userData;
+
+  const newPosition = { ...gridPosition };
+
+  if (v[e.face.a][common] > 0) {
+    newPosition[common]++;
+  } else {
+    newPosition[common]--;
+  }
+  addModule([newPosition.x, newPosition.y, newPosition.z]);
+};
+
 function Building() {
   // const ref = React.useRef(null);
 
@@ -144,6 +188,7 @@ function Building() {
   const [position, setPosition] = React.useState([0, 0, 0]);
   const [rotation, setRotation] = React.useState(0);
   const { size, viewport, camera, gl } = useThree();
+  const [modules, setModules] = React.useState([[0, 0, 0]]);
   const aspect = size.width / viewport.width;
 
   const ref = React.useCallback(node => {
@@ -152,6 +197,12 @@ function Building() {
       setObjects([node]);
     }
   }, []);
+
+  const addModule = position => {
+    if (!modules.some(m => m.toString() === position.toString())) {
+      setModules([...modules, position]);
+    }
+  };
 
   // const bind = useDrag(
   //   ({ offset, vxvy }) => {
@@ -168,32 +219,55 @@ function Building() {
   //     console.log(event);
   //   });
 
+  const geometry = React.useMemo(() => new THREE.BoxGeometry(1, 1, 1), []);
+  const material = React.useMemo(() => new THREE.MeshNormalMaterial(), []);
+
   return (
     <>
       <group position={position} rotation={[0, rotation, 0]}>
-        <mesh
-          // {...(bind() as any)}
-          ref={ref}
-          onPointerDown={e => {
-            changeControls(false);
-            dragging = true;
-          }}
-          userData={{ setPosition, setRotation }}
-          // onPointerOver={e => console.log("hover")}
-          // onPointerOut={e => console.log("unhover")}
-        >
-          <boxGeometry attach="geometry" args={[1, 1, 1]} />
-          <meshNormalMaterial attach="material" />
-        </mesh>
+        {modules.map(([x, y, z]) => {
+          const position = [
+            x * (GRID_SIZE * MIN_WIDTH),
+            y * (GRID_SIZE * MIN_HEIGHT),
+            z * (GRID_SIZE * MIN_LENGTH)
+          ];
+
+          return (
+            <mesh
+              // {...(bind() as any)}
+              position={position}
+              onClick={extrude}
+              ref={ref}
+              onPointerDown={e => {
+                changeControls(false);
+                dragging = true;
+              }}
+              userData={{
+                setPosition,
+                setRotation,
+                gridPosition: { x, y, z },
+                addModule
+              }}
+              geometry={geometry}
+              material={material}
+              // onPointerOver={e => console.log("hover")}
+              // onPointerOut={e => console.log("unhover")}
+            />
+          );
+        })}
+
         <group
           onPointerDown={e => {
             changeControls(false);
+            // console.log(e.eventObject.rotation.y);
+            initialRotation = e.object.parent.parent.rotation.y;
             rotating = true;
           }}
         >
           <CircularGrid />
         </group>
       </group>
+
       {/* {objects && <Dragger objects={objects} />} */}
       {objects && <MoveControls objects={objects} />}
     </>
@@ -249,7 +323,7 @@ const MoveControls = ({ objects }) => {
         // _window.position.copy(intersects[0].point);
         // _window.lookAt(lookAtVector.copy(intersects[0].point).add(worldNormal));
       } else if (rotating) {
-        objects[0].userData.setRotation(mouse.x * 4);
+        objects[0].userData.setRotation(initialRotation + mouse.x * 4);
       }
     }
 
