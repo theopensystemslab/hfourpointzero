@@ -171,6 +171,7 @@ const Map: React.FC = () => {
     >
       <Geocoder
         antialias
+        countries="gb,ie,fr,nl,es,de,be,ch"
         mapRef={ref}
         onResult={event => {
           // setState(state => ({
