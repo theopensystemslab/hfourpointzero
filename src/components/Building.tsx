@@ -54,13 +54,21 @@ const Building: React.FC<any> = ({ idx }) => {
   const ref = React.useRef(null);
   const { camera } = useThree();
 
-  const { building, addModule, editing, setEditing, setTarget } = useStore(
+  const {
+    building,
+    addModule,
+    editing,
+    setEditing,
+    setTarget,
+    target
+  } = useStore(
     state => ({
       building: state.buildings[idx],
       addModule: state.addModule,
       editing: state.editing,
       setEditing: state.setEditing,
-      setTarget: state.setTarget
+      setTarget: state.setTarget,
+      target: state.target
     }),
     shallow
   );
@@ -69,6 +77,18 @@ const Building: React.FC<any> = ({ idx }) => {
 
   const [position, setPosition] = React.useState(building.position);
   const [rotation, setRotation] = React.useState(0);
+
+  const focus = endPos => {
+    const start = new THREE.Vector3(...target);
+    const end = new THREE.Vector3(...endPos);
+
+    for (let i = 0; i <= 1; i += 0.1) {
+      setTimeout(() => {
+        const v = new THREE.Vector3().lerpVectors(start, end, i);
+        setTarget([v.x, v.y, v.z]);
+      }, i * 150);
+    }
+  };
 
   return (
     <>
@@ -89,13 +109,13 @@ const Building: React.FC<any> = ({ idx }) => {
                   e.stopPropagation();
 
                   const now = Date.now();
-                  console.log(now);
 
                   if (now - config.clickTime < 250) {
                     if (beingEdited) {
-                      setTarget([0, 0.5, 0]);
+                      focus([0, 0.5, 0]);
                     } else {
-                      setTarget([position[0], position[1], position[2]]);
+                      focus([position[0], position[1], position[2]]);
+                      // setTarget([position[0], position[1], position[2]]);
                     }
 
                     // camera.zoom = 2;
