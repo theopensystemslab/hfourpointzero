@@ -3,6 +3,7 @@ import * as React from "react";
 import "react-three-fiber";
 import { useThree } from "react-three-fiber";
 import * as THREE from "three";
+import { isNull } from "util";
 import shallow from "zustand/shallow";
 import { useStore } from "../store";
 import CircularGrid from "./CircularGrid";
@@ -86,7 +87,7 @@ const Building: React.FC<any> = ({ idx }) => {
       setTimeout(() => {
         const v = new THREE.Vector3().lerpVectors(start, end, i);
         setTarget([v.x, v.y, v.z]);
-      }, i * 150);
+      }, i * 200);
     }
   };
 
@@ -121,17 +122,17 @@ const Building: React.FC<any> = ({ idx }) => {
                     // camera.zoom = 2;
 
                     setEditing(idx);
-                    config.clickTime = 0;
                   } else {
                     if (beingEdited) {
                       extrude(e);
                     }
-                    config.clickTime = now;
                   }
+
+                  config.clickTime = now;
                 }}
                 ref={ref}
                 onPointerDown={e => {
-                  if (!beingEdited) {
+                  if (isNull(editing) && !beingEdited) {
                     config.activeObject = ref.current;
                     config.changeControls(false);
                     config.dragging = true;
@@ -157,7 +158,7 @@ const Building: React.FC<any> = ({ idx }) => {
           );
         })}
 
-        {!beingEdited && (
+        {isNull(editing) && (
           <group
             onPointerDown={e => {
               config.changeControls(false);
