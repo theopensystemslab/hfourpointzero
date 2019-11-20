@@ -1,11 +1,19 @@
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
-import { area as getArea, polygon } from "@turf/turf";
-import React, { useState } from "react";
+import { area as getArea, centroid, polygon } from "@turf/turf";
+// import DeckGL, { GeoJsonLayer } from "deck.gl";
+import "mapbox-gl/dist/mapbox-gl.css";
+import React, { useRef, useState } from "react";
 import ReactMapGL from "react-map-gl";
 import { Editor, EditorModes } from "react-map-gl-draw";
+import Geocoder from "react-map-gl-geocoder";
+import "react-map-gl-geocoder/dist/mapbox-gl-geocoder.css";
 import shallow from "zustand/shallow";
 import { useStore } from "./store";
 import { getEditHandleStyle, getFeatureStyle } from "./styles";
+import { useApi } from "./useApi";
+// import { useApi } from "./useApi";
+
+// let result;
 
 const DrawControls: React.FC = () => {
   const { deleteSelected, setMode, map, selectedFeatureIndex } = useStore(
@@ -20,7 +28,7 @@ const DrawControls: React.FC = () => {
   if (!map) return null;
 
   return (
-    <div className="mapboxgl-ctrl-top-left">
+    <div className="mapboxgl-ctrl-top-right">
       <div className="mapboxgl-ctrl-group mapboxgl-ctrl">
         {parseInt(selectedFeatureIndex) >= 0 ? (
           <button
@@ -48,29 +56,20 @@ const Continue = () => {
 
   const { coordinates } = map.getFeatures()[0].geometry;
   const poly = polygon(coordinates);
+  const [lat, lng] = centroid(poly).geometry.coordinates;
   const area = getArea(poly);
+  const [data, loading, error] = useApi(
+    `https://api.mapbox.com/geocoding/v5/mapbox.places/${lat},${lng}.json?access_token=${process.env.REACT_APP_MAPBOX_ACCESS_TOKEN}`
+  );
 
   const ob = {
     area,
     coordinates: coordinates[0],
     projected: coordinates[0].map(xy => map.project(xy)),
-    zoom: map._context.viewport.zoom
+    zoom: map._context.viewport.zoom,
+    placeName:
+      data && data.features ? data.features[0].place_name : "New Location"
   };
-
-  // console.log({
-  //   coordinates: coordinates[0],
-  //   cartesian,
-  //   solution: solution[0].map(({ X, Y }) => [X / 10000, Y / 10000]),
-  //   center,
-  //   clock: clockwiseSort(cartesian.slice(0, -1), 0)
-  // });
-
-  // const shape = coordinates[0].map(([x, y]) => {
-  //   const latitude = (x - center[0]) * 111320;
-  //   const longitude = (y - center[1]) * ((4007500 * Math.cos(latitude)) / 360);
-
-  //   return [latitude, longitude];
-  // });
 
   return (
     <div
@@ -79,6 +78,11 @@ const Continue = () => {
         setLocation(ob);
       }}
     >
+      <p>
+        {data && data.features
+          ? data.features[0].place_name
+          : "finding location..."}
+      </p>
       <p>{area.toFixed(1)}m²</p>
       <h1>Continue</h1>
     </div>
@@ -131,27 +135,68 @@ const RenderEditor = () => {
 };
 
 const Map: React.FC = () => {
-  const [viewport, setViewport] = useState({
-    longitude: 4,
-    latitude: 50,
-    zoom: 18 //4
+  // const ref = React.createRef();
+  const ref = useRef(null);
+
+  const [state, setState] = useState({
+    viewport: {
+      longitude: 4,
+      latitude: 50,
+      zoom: 4
+    },
+    searchResultLayer: null
   });
+
+  const handleViewportChange = viewport => {
+    setState(
+      state =>
+        ({
+          searchResultLayer: state.searchResultLayer,
+          viewport: { ...state.viewport, ...viewport }
+        } as any)
+    );
+  };
 
   return (
     <ReactMapGL
-      {...viewport}
+      {...state.viewport}
+      ref={ref}
       width="100%"
       height="100vh"
-      mapStyle="mapbox://styles/mapbox/satellite-v9"
-      onViewportChange={viewport => {
-        setViewport({
-          longitude: viewport.longitude,
-          latitude: viewport.latitude,
-          zoom: viewport.zoom
-        });
-      }}
+      // mapStyle="mapbox://styles/mapbox/satellite-v9"
+      mapStyle="mapbox://styles/mapbox/streets-v8"
+      // mapStyle="mapbox://styles/mapbox/dark-v10"
+      // mapStyle="mapbox://styles/opensystemslab/ck2ls07xa0juf1cp4al1sy7iz"
+      onViewportChange={handleViewportChange}
     >
+      <Geocoder
+        antialias
+        mapRef={ref}
+        onResult={event => {
+          // setState(state => ({
+          //   viewport: state.viewport,
+          //   searchResultLayer: new GeoJsonLayer({
+          //     id: "search-result",
+          //     data: event.result.geometry,
+          //     getFillColor: [255, 0, 0, 128],
+          //     getRadius: 1000,
+          //     pointRadiusMinPixels: 10,
+          //     pointRadiusMaxPixels: 10
+          //   })
+          // }));
+        }}
+        onViewportChange={viewport => {
+          const geocoderDefaultOverrides = { transitionDuration: 1000 };
+          handleViewportChange({
+            ...viewport,
+            ...geocoderDefaultOverrides
+          });
+        }}
+        mapboxApiAccessToken={process.env.REACT_APP_MAPBOX_ACCESS_TOKEN}
+        position="top-left"
+      />
       <RenderEditor />
+      {/* <DeckGL {...state.viewport} layers={[state.searchResultLayer]} /> */}
     </ReactMapGL>
   );
 };

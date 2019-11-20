@@ -5,6 +5,12 @@ import Controls from "./components/Controls";
 import MoveControls from "./components/MoveControls";
 import Outline from "./components/Outline";
 import Sidebar from "./components/Sidebar";
+import { useStore } from "./store";
+
+const PlaceName = () => {
+  const placeName = useStore(state => state.location.placeName);
+  return <h1 id="place">{placeName}</h1>;
+};
 
 const Editor: React.FC<{ location: any }> = ({ location }) => {
   return (
@@ -24,7 +30,7 @@ const Editor: React.FC<{ location: any }> = ({ location }) => {
         </Canvas>
       </div>
       <Sidebar />
-      <h1>Carrer de Pallars, Barcelona</h1>
+      <PlaceName />
     </div>
   );
 };
