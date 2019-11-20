@@ -1,6 +1,7 @@
 import intersectionBy from "lodash/intersectionBy";
 import * as React from "react";
 import "react-three-fiber";
+import { useThree } from "react-three-fiber";
 import * as THREE from "three";
 import shallow from "zustand/shallow";
 import { useStore } from "../store";
@@ -45,44 +46,35 @@ const geometry = new THREE.BoxGeometry(
 
 const material = new THREE.MeshBasicMaterial({ color: 0x000000 });
 
+const editMaterial = new THREE.MeshBasicMaterial({ color: "limegreen" });
+
 const lineMaterial = new THREE.LineBasicMaterial({ color: 0xffffff });
 
 const Building: React.FC<any> = ({ idx }) => {
   const ref = React.useRef(null);
+  const { camera } = useThree();
 
-  const { building, addModule } = useStore(
-    state => ({ building: state.buildings[idx], addModule: state.addModule }),
+  const { building, addModule, editing, setEditing, setTarget } = useStore(
+    state => ({
+      building: state.buildings[idx],
+      addModule: state.addModule,
+      editing: state.editing,
+      setEditing: state.setEditing,
+      setTarget: state.setTarget
+    }),
     shallow
   );
 
+  const beingEdited = editing === idx;
+
   const [position, setPosition] = React.useState(building.position);
   const [rotation, setRotation] = React.useState(0);
-
-  // const geometry = React.useMemo(
-  //   () =>
-  //     new THREE.BoxGeometry(
-  //       config.GRID_SIZE * config.MIN_WIDTH,
-  //       config.GRID_SIZE * config.MIN_HEIGHT,
-  //       config.GRID_SIZE * config.MIN_LENGTH
-  //     ),
-  //   []
-  // );
-
-  // const material = React.useMemo(
-  //   () => new THREE.MeshBasicMaterial({ color: 0x000000 }),
-  //   []
-  // );
-
-  // const lineMaterial = React.useMemo(
-  //   () => new THREE.LineBasicMaterial({ color: 0xffffff }),
-  //   []
-  // );
 
   return (
     <>
       <group position={position} rotation={[0, rotation, 0]}>
         {building.modules.map(([x, y, z]) => {
-          const position = [
+          const gridPosition = [
             x * (config.GRID_SIZE * config.MIN_WIDTH),
             y * (config.GRID_SIZE * config.MIN_HEIGHT),
             z * (config.GRID_SIZE * config.MIN_LENGTH)
@@ -92,20 +84,38 @@ const Building: React.FC<any> = ({ idx }) => {
             <React.Fragment key={[x, y, z].join("-")}>
               <mesh
                 // {...(bind() as any)}
-                position={position}
+                position={gridPosition}
                 onClick={e => {
-                  if (Date.now() - config.clickTime < 300) {
-                    console.log("DOUBLE CLICK");
+                  e.stopPropagation();
+
+                  const now = Date.now();
+                  console.log(now);
+
+                  if (now - config.clickTime < 250) {
+                    if (beingEdited) {
+                      setTarget([0, 0.5, 0]);
+                    } else {
+                      setTarget([position[0], position[1], position[2]]);
+                    }
+
+                    // camera.zoom = 2;
+
+                    setEditing(idx);
+                    config.clickTime = 0;
                   } else {
-                    extrude(e);
+                    if (beingEdited) {
+                      extrude(e);
+                    }
+                    config.clickTime = now;
                   }
-                  config.clickTime = Date.now();
                 }}
                 ref={ref}
                 onPointerDown={e => {
-                  config.activeObject = ref.current;
-                  config.changeControls(false);
-                  config.dragging = true;
+                  if (!beingEdited) {
+                    config.activeObject = ref.current;
+                    config.changeControls(false);
+                    config.dragging = true;
+                  }
                 }}
                 userData={{
                   setPosition,
@@ -116,28 +126,30 @@ const Building: React.FC<any> = ({ idx }) => {
                   }
                 }}
                 geometry={geometry}
-                material={material}
+                material={beingEdited ? editMaterial : material}
                 // onPointerOver={e => console.log("hover")}
                 // onPointerOut={e => console.log("unhover")}
               />
-              <lineSegments position={position} material={lineMaterial}>
+              <lineSegments position={gridPosition} material={lineMaterial}>
                 <edgesGeometry attach="geometry" args={[geometry]} />
               </lineSegments>
             </React.Fragment>
           );
         })}
 
-        <group
-          onPointerDown={e => {
-            config.changeControls(false);
-            // console.log(e.eventObject.rotation.y);
-            config.activeObject = ref.current;
-            config.initialRotation = e.object.parent.parent.rotation.y;
-            config.rotating = true;
-          }}
-        >
-          <CircularGrid />
-        </group>
+        {!beingEdited && (
+          <group
+            onPointerDown={e => {
+              config.changeControls(false);
+              // console.log(e.eventObject.rotation.y);
+              config.activeObject = ref.current;
+              config.initialRotation = e.object.parent.parent.rotation.y;
+              config.rotating = true;
+            }}
+          >
+            <CircularGrid />
+          </group>
+        )}
       </group>
     </>
   );

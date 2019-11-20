@@ -6,6 +6,11 @@ const location = localStorage.getItem("location")
   : undefined;
 
 export const [useStore] = create((set, get) => ({
+  target: [0, 0.5, 0],
+  setTarget: target => {
+    console.log({ target });
+    set({ target });
+  },
   map: undefined,
   location,
   mode: EditorModes.READ_ONLY,
@@ -17,6 +22,7 @@ export const [useStore] = create((set, get) => ({
       set({ selectedFeatureIndex: undefined });
     }
   },
+  editing: 1,
   buildings: [
     {
       position: [0, 0, 10],
@@ -55,6 +61,9 @@ export const [useStore] = create((set, get) => ({
   },
 
   // setViewport: viewport => set({ viewport }),
+  setEditing: idx => {
+    set({ editing: get().editing === idx ? null : idx });
+  },
   setMap: map => set({ map }),
   setLocation: location => {
     localStorage.setItem("location", JSON.stringify(location));

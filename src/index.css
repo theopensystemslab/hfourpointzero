@@ -47,11 +47,13 @@ h1#place {
 }
 
 #sidebar {
+  z-index: 2;
   background: black;
   height: 100%;
   width: 300px;
   padding: 20px;
   color: white;
+  user-select: none;
   /* position: fixed;
   right: 0;
   top: 0;
@@ -69,4 +71,8 @@ h1#place {
   height: 100%;
   width: 100%;
   flex: 1;
+}
+
+table.active {
+  color: limegreen !important;
 }
