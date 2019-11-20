@@ -164,9 +164,9 @@ const Map: React.FC = () => {
       width="100%"
       height="100vh"
       // mapStyle="mapbox://styles/mapbox/satellite-v9"
-      mapStyle="mapbox://styles/mapbox/streets-v8"
+      // mapStyle="mapbox://styles/mapbox/streets-v8"
       // mapStyle="mapbox://styles/mapbox/dark-v10"
-      // mapStyle="mapbox://styles/opensystemslab/ck2ls07xa0juf1cp4al1sy7iz"
+      mapStyle="mapbox://styles/opensystemslab/ck2ls07xa0juf1cp4al1sy7iz"
       onViewportChange={handleViewportChange}
     >
       <Geocoder
