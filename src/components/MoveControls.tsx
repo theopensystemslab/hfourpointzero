@@ -8,7 +8,7 @@ import { config } from "./_vars";
 extend({ DragControls });
 
 const MoveControls = () => {
-  const { camera, raycaster } = useThree();
+  const { camera, raycaster, gl } = useThree();
 
   React.useEffect(() => {
     let mouse = new THREE.Vector2();
@@ -20,8 +20,8 @@ const MoveControls = () => {
       if (!config.dragging && !config.rotating) return;
 
       mouse.set(
-        (event.clientX / window.innerWidth) * 2 - 1,
-        -(event.clientY / window.innerHeight) * 2 + 1
+        (event.clientX / gl.domElement.width) * 2 - 1,
+        -(event.clientY / gl.domElement.height) * 2 + 1
       );
 
       raycaster.setFromCamera(mouse, camera);

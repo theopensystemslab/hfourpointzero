@@ -52,10 +52,14 @@ h1#place {
   width: 300px;
   padding: 20px;
   color: white;
+  /* position: fixed;
+  right: 0;
+  top: 0;
+  bottom: 0; */
 }
 
 #editor-container {
-  width: 100%;
+  /* width: calc(100% - 305px); */
   height: 100vh;
   position: relative;
   display: flex;
@@ -63,5 +67,6 @@ h1#place {
 
 #editor {
   height: 100%;
+  width: 100%;
   flex: 1;
 }
