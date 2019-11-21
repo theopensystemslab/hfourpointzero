@@ -218,7 +218,7 @@ const Sidebar = () => {
                   (grid.size * grid.buildingWidth) *
                   (grid.size * grid.buildingLength);
 
-                const cost = totalFloorArea * 1750;
+                const cost = totalFloorArea * 1750.26;
                 total += cost;
 
                 return (
@@ -252,7 +252,8 @@ const Sidebar = () => {
                           <th>External Footprint</th>
                           <td>
                             {footprint.toLocaleString("en", {
-                              minimumFractionDigits: 2
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2
                             })}
                             m²
                           </td>
@@ -261,7 +262,8 @@ const Sidebar = () => {
                           <th>Total floor area</th>
                           <td>
                             {totalFloorArea.toLocaleString("en", {
-                              minimumFractionDigits: 2
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2
                             })}
                             m²
                           </td>
@@ -280,7 +282,8 @@ const Sidebar = () => {
                                   (grid.size * grid.buildingWidth) *
                                   (grid.size * grid.buildingLength)
                                 ).toLocaleString("en", {
-                                  minimumFractionDigits: 2
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2
                                 })}
                                 m²
                               </td>
@@ -294,7 +297,8 @@ const Sidebar = () => {
                               totalFloorArea *
                               (grid.size * grid.buildingHeight)
                             ).toLocaleString("en", {
-                              minimumFractionDigits: 2
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2
                             })}
                             m³
                           </td>
@@ -311,8 +315,9 @@ const Sidebar = () => {
                           <th>Chassis Cost</th>
                           <td>
                             €
-                            {(totalFloorArea * 466).toLocaleString("en", {
-                              minimumFractionDigits: 2
+                            {(totalFloorArea * 466.12).toLocaleString("en", {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2
                             })}
                           </td>
                         </tr>
@@ -320,8 +325,9 @@ const Sidebar = () => {
                           <th>Other Costs</th>
                           <td>
                             €
-                            {(totalFloorArea * 1284).toLocaleString("en", {
-                              minimumFractionDigits: 2
+                            {(totalFloorArea * 1284.14).toLocaleString("en", {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2
                             })}
                           </td>
                         </tr>
@@ -332,7 +338,8 @@ const Sidebar = () => {
                           <td>
                             €
                             {cost.toLocaleString("en", {
-                              minimumFractionDigits: 2
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2
                             })}
                           </td>
                         </tr>
@@ -348,7 +355,11 @@ const Sidebar = () => {
                 <tr>
                   <th>Total</th>
                   <td>
-                    €{total.toLocaleString("en", { minimumFractionDigits: 2 })}
+                    €
+                    {total.toLocaleString("en", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2
+                    })}
                   </td>
                 </tr>
               </tbody>
