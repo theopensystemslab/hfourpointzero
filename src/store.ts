@@ -22,6 +22,16 @@ export const [useStore] = create((set, get) => ({
       set({ selectedFeatureIndex: undefined });
     }
   },
+  grid: {
+    size: 1.2,
+    // length: 1.2,
+    buildingWidth: 4,
+    buildingHeight: 2,
+    buildingLength: 1
+  },
+  setGrid: grid => {
+    set({ grid });
+  },
   editing: 1,
   buildings: [
     // {

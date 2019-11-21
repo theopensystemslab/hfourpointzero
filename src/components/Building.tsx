@@ -40,12 +40,6 @@ const extrude = e => {
   addModule([newPosition.x, newPosition.y, newPosition.z]);
 };
 
-const geometry = new THREE.BoxGeometry(
-  config.GRID_SIZE * config.MIN_WIDTH,
-  config.GRID_SIZE * config.MIN_HEIGHT,
-  config.GRID_SIZE * config.MIN_LENGTH
-);
-
 const material = new THREE.MeshBasicMaterial({ color: 0x000000 });
 
 const editMaterial = new THREE.MeshBasicMaterial({
@@ -65,7 +59,8 @@ const Building: React.FC<any> = ({ idx }) => {
     editing,
     setEditing,
     setTarget,
-    target
+    target,
+    grid
   } = useStore(
     state => ({
       building: state.buildings[idx],
@@ -73,7 +68,8 @@ const Building: React.FC<any> = ({ idx }) => {
       editing: state.editing,
       setEditing: state.setEditing,
       setTarget: state.setTarget,
-      target: state.target
+      target: state.target,
+      grid: state.grid
     }),
     shallow
   );
@@ -95,14 +91,24 @@ const Building: React.FC<any> = ({ idx }) => {
     }
   };
 
+  const geometry = React.useMemo(
+    () =>
+      new THREE.BoxGeometry(
+        grid.size * grid.buildingWidth,
+        grid.size * grid.buildingHeight,
+        grid.size * grid.buildingLength
+      ),
+    [grid]
+  );
+
   return (
     <>
       <group position={position} rotation={[0, rotation, 0]}>
         {building.modules.map(([x, y, z]) => {
           const gridPosition = [
-            x * (config.GRID_SIZE * config.MIN_WIDTH),
-            y * (config.GRID_SIZE * config.MIN_HEIGHT),
-            z * (config.GRID_SIZE * config.MIN_LENGTH)
+            x * (grid.size * grid.buildingWidth),
+            y * (grid.size * grid.buildingHeight),
+            z * (grid.size * grid.buildingLength)
           ];
 
           return (
@@ -172,6 +178,13 @@ const Building: React.FC<any> = ({ idx }) => {
           >
             <CircularGrid />
           </group>
+        )}
+
+        {beingEdited && (
+          <gridHelper
+            args={[20 * grid.size, 20, 0x555555, 0x555555]}
+            position={new THREE.Vector3(0, -grid.size / 2, -grid.size / 2)}
+          />
         )}
       </group>
     </>

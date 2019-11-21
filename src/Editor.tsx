@@ -20,11 +20,11 @@ const Editor: React.FC<{ location: any }> = ({ location }) => {
           style={{ height: "100%" }}
           camera={{
             fov: 50,
-            position: [0, 10, 0]
+            position: [0, 20, 0]
           }}
         >
-          <Outline />
           <Buildings />
+          <Outline />
           <Controls />
           <MoveControls />
         </Canvas>

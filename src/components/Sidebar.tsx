@@ -3,21 +3,54 @@ import shallow from "zustand/shallow";
 import { useStore } from "../store";
 
 const Sidebar = () => {
-  const { buildings, area, editing, setEditing, addBuilding } = useStore(
+  const {
+    buildings,
+    area,
+    editing,
+    setEditing,
+    addBuilding,
+    grid,
+    setGrid
+  } = useStore(
     state => ({
       buildings: state.buildings,
       area: state.location.area,
       editing: state.editing,
       setEditing: state.setEditing,
-      addBuilding: state.addBuilding
+      addBuilding: state.addBuilding,
+      grid: state.grid,
+      setGrid: state.setGrid
     }),
     shallow
   );
 
   let total = 0;
 
+  const gridStuff = ["size"];
+
   return (
     <aside id="sidebar">
+      <h2>Grid</h2>
+      {gridStuff.map(g => (
+        <div key={g}>
+          <span>Grid {g}</span>
+          <input
+            type="range"
+            min={0.5}
+            max={2.5}
+            step={0.1}
+            value={grid[g]}
+            onChange={e =>
+              setGrid({
+                ...grid,
+                [g]: e.target.value
+              })
+            }
+          />
+          ({grid[g]}m)
+        </div>
+      ))}
+
       <table>
         <tbody>
           <tr>
@@ -26,7 +59,6 @@ const Sidebar = () => {
           </tr>
         </tbody>
       </table>
-
       {buildings.map((b, i) => {
         const footprint = b.modules.filter(([, y]) => y === 0).length * 4;
         const cost = b.modules.length * 4 * 1500;
@@ -64,6 +96,15 @@ const Sidebar = () => {
           </tr>
         </tbody>
       </table>
+
+      <button
+        onClick={() => {
+          localStorage.removeItem("location");
+          window.location.reload();
+        }}
+      >
+        Restart
+      </button>
     </aside>
   );
 };
