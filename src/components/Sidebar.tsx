@@ -270,7 +270,7 @@ const Sidebar = () => {
                       <tbody>
                         {Array.from(new Set(b.modules.map(([, y]) => y))).map(
                           (i: number) => (
-                            <tr>
+                            <tr key={i}>
                               <th>
                                 {i === 0 ? "Ground floor" : `Floor ${i}`} area
                               </th>

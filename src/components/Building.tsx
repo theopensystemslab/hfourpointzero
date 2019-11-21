@@ -115,6 +115,24 @@ const Building: React.FC<any> = ({ idx }) => {
     [grid]
   );
 
+  const ob = building.modules
+    .filter(([x, y, z]) => y === 0)
+    .reduce(
+      (acc, [x, y, z]) => {
+        if (x < acc.minX) acc.minX = x;
+        if (x > acc.maxX) acc.maxX = x;
+        if (z < acc.minZ) acc.minZ = z;
+        if (z > acc.maxZ) acc.maxZ = z;
+        return acc;
+      },
+      { minX: Infinity, maxX: -Infinity, minZ: Infinity, maxZ: -Infinity }
+    );
+
+  const length = Math.max(
+    Math.abs(ob.minZ - ob.maxZ) * grid.size * grid.buildingLength,
+    Math.abs(ob.minX - ob.maxX) * grid.size * grid.buildingWidth
+  );
+
   return (
     <>
       <group position={position} rotation={[0, rotation, 0]}>
@@ -192,7 +210,7 @@ const Building: React.FC<any> = ({ idx }) => {
               config.rotating = true;
             }}
           >
-            <CircularGrid />
+            <CircularGrid size={length} />
           </group>
         )}
 
