@@ -63,6 +63,10 @@ export const [useStore] = create((set, get) => ({
 
   removeBuilding: idx => {
     const { buildings } = get();
+    set({
+      buildings: [...buildings.slice(0, idx), ...buildings.slice(idx + 1)],
+      editing: null
+    });
     // buildings.splice(idx, 1);
     // set({
     //   buildings
