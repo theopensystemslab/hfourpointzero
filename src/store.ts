@@ -82,6 +82,8 @@ export const [useStore] = create((set, get) => ({
     });
   },
 
+  cacheBuster: 0,
+
   addModule: (idx, position) => {
     const { buildings } = get();
     if (
@@ -94,7 +96,7 @@ export const [useStore] = create((set, get) => ({
         modules: [...buildings[idx].modules, position]
       };
 
-      set({ buildings });
+      set({ buildings, cacheBuster: Math.random() });
     }
   },
 

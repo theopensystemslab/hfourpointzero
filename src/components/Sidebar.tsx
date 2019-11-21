@@ -13,7 +13,9 @@ const Sidebar = () => {
     location,
     removeBuilding,
     activeTab,
-    setActiveTab
+    setActiveTab,
+    cacheBuster,
+    buildings
   } = useStore(
     state => ({
       area: state.location.area,
@@ -25,14 +27,11 @@ const Sidebar = () => {
       location: state.location,
       removeBuilding: state.removeBuilding,
       activeTab: state.activeTab,
-      setActiveTab: state.setActiveTab
+      setActiveTab: state.setActiveTab,
+      cacheBuster: state.cacheBuster,
+      buildings: state.buildings
     }),
     shallow
-  );
-
-  const buildings = useStore(
-    state => state.buildings,
-    (a, b) => JSON.stringify(a) === JSON.stringify(b)
   );
 
   let total = 0;
@@ -251,8 +250,24 @@ const Sidebar = () => {
                         </tr>
                         <tr>
                           <th>External Footprint</th>
-                          <td>{footprint.toFixed(2)}m²</td>
+                          <td>
+                            {footprint.toLocaleString("en", {
+                              minimumFractionDigits: 2
+                            })}
+                            m²
+                          </td>
                         </tr>
+                        <tr>
+                          <th>Total floor area</th>
+                          <td>
+                            {totalFloorArea.toLocaleString("en", {
+                              minimumFractionDigits: 2
+                            })}
+                            m²
+                          </td>
+                        </tr>
+                      </thead>
+                      <tbody>
                         {Array.from(new Set(b.modules.map(([, y]) => y))).map(
                           (i: number) => (
                             <tr>
@@ -264,28 +279,23 @@ const Sidebar = () => {
                                   b.modules.filter(([, y]) => y === i).length *
                                   (grid.size * grid.buildingWidth) *
                                   (grid.size * grid.buildingLength)
-                                ).toFixed(2)}
+                                ).toLocaleString("en", {
+                                  minimumFractionDigits: 2
+                                })}
                                 m²
                               </td>
                             </tr>
                           )
                         )}
                         <tr>
-                          <th>Total floor area</th>
-                          <td>
-                            {totalFloorArea.toFixed(2)}
-                            m²
-                          </td>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
                           <th>Volume</th>
                           <td>
                             {(
                               totalFloorArea *
                               (grid.size * grid.buildingHeight)
-                            ).toFixed(2)}
+                            ).toLocaleString("en", {
+                              minimumFractionDigits: 2
+                            })}
                             m³
                           </td>
                         </tr>
@@ -297,19 +307,34 @@ const Sidebar = () => {
                           <th>Embedded Carbon</th>
                           <td>_</td>
                         </tr>
-                      </tbody>
-                      <tfoot>
                         <tr>
                           <th>Chassis Cost</th>
-                          <td>€{(totalFloorArea * 466).toLocaleString()}</td>
+                          <td>
+                            €
+                            {(totalFloorArea * 466).toLocaleString("en", {
+                              minimumFractionDigits: 2
+                            })}
+                          </td>
                         </tr>
                         <tr>
                           <th>Other Costs</th>
-                          <td>€{(totalFloorArea * 1284).toLocaleString()}</td>
+                          <td>
+                            €
+                            {(totalFloorArea * 1284).toLocaleString("en", {
+                              minimumFractionDigits: 2
+                            })}
+                          </td>
                         </tr>
+                      </tbody>
+                      <tfoot>
                         <tr>
                           <th>Total Cost</th>
-                          <td>€{cost.toLocaleString()}</td>
+                          <td>
+                            €
+                            {cost.toLocaleString("en", {
+                              minimumFractionDigits: 2
+                            })}
+                          </td>
                         </tr>
                       </tfoot>
                     </table>
@@ -322,7 +347,9 @@ const Sidebar = () => {
               <tbody>
                 <tr>
                   <th>Total</th>
-                  <td>€{total.toLocaleString()}</td>
+                  <td>
+                    €{total.toLocaleString("en", { minimumFractionDigits: 2 })}
+                  </td>
                 </tr>
               </tbody>
             </table>
