@@ -41,9 +41,9 @@ const extrude = e => {
 
 const material = new THREE.MeshBasicMaterial({
   color: 0x000000,
-  opacity: 0.75,
+  opacity: 0.65,
   transparent: true,
-  depthTest: true,
+  // depthTest: true,
   polygonOffset: true,
   polygonOffsetFactor: 1, // positive value pushes polygon further away
   polygonOffsetUnits: 20

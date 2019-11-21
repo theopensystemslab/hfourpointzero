@@ -1,4 +1,3 @@
-import { booleanContains, polygon } from "@turf/turf";
 import * as React from "react";
 import { extend, useThree } from "react-three-fiber";
 import * as THREE from "three";
@@ -32,19 +31,19 @@ const MoveControls = () => {
 
         const { x, y, z } = intersects;
 
-        const p = [
-          [x - 0.5, z - 0.5],
-          [x + 0.5, z - 0.5],
-          [x + 0.5, z + 0.5],
-          [x - 0.5, z + 0.5],
-          [x - 0.5, z - 0.5]
-        ];
+        // const p = [
+        //   [x - 0.5, z - 0.5],
+        //   [x + 0.5, z - 0.5],
+        //   [x + 0.5, z + 0.5],
+        //   [x - 0.5, z + 0.5],
+        //   [x - 0.5, z - 0.5]
+        // ];
 
-        if (booleanContains(config.outline, polygon([p]))) {
-          config.activeObject.material.opacity = 1;
-        } else {
-          config.activeObject.material.opacity = 0.7;
-        }
+        // if (booleanContains(config.outline, polygon([p]))) {
+        //   config.activeObject.material.opacity = 1;
+        // } else {
+        //   config.activeObject.material.opacity = 0.7;
+        // }
 
         // objects[0].position.copy(intersects);
 
