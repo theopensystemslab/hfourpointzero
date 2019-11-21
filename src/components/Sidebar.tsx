@@ -26,30 +26,63 @@ const Sidebar = () => {
 
   let total = 0;
 
-  const gridStuff = ["size"];
+  const gridStuff = [
+    {
+      name: "Grid Size",
+      var: "size",
+      min: 0.5,
+      max: 2.5,
+      step: 0.1,
+      unit: "m"
+    },
+    {
+      name: "Unit Width",
+      var: "buildingWidth",
+      min: 1,
+      max: 5,
+      step: 1
+    },
+    {
+      name: "Unit Length",
+      var: "buildingLength",
+      min: 1,
+      max: 5,
+      step: 1
+    },
+    {
+      name: "Unit Height",
+      var: "buildingHeight",
+      min: 2,
+      max: 3,
+      step: 0.1
+    }
+  ];
 
   return (
     <aside id="sidebar">
       <h2>Grid</h2>
       {gridStuff.map(g => (
-        <div key={g}>
-          <span>Grid {g}</span>
+        <div key={g.name}>
+          <span>{g.name}</span>
           <input
             type="range"
-            min={0.5}
-            max={2.5}
-            step={0.1}
-            value={grid[g]}
+            min={g.min}
+            max={g.max}
+            step={g.step}
+            value={grid[g.var]}
             onChange={e =>
               setGrid({
                 ...grid,
-                [g]: e.target.value
+                [g.var]: e.target.value
               })
             }
           />
-          ({grid[g]}m)
+          {grid[g.var]}
+          {g.unit && g.unit}
         </div>
       ))}
+
+      <h2>Details</h2>
 
       <table>
         <tbody>
@@ -88,6 +121,9 @@ const Sidebar = () => {
         );
       })}
       <button onClick={addBuilding}>Add Building</button>
+
+      <hr />
+
       <table>
         <tbody>
           <tr>
@@ -97,6 +133,7 @@ const Sidebar = () => {
         </tbody>
       </table>
 
+      <hr />
       <button
         onClick={() => {
           localStorage.removeItem("location");
