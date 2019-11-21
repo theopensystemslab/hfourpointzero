@@ -33,7 +33,7 @@ export const [useStore] = create((set, get) => ({
   setGrid: grid => {
     set({ grid });
   },
-  editing: 1,
+  editing: undefined,
   buildings: [
     // {
     //   position: [0, 0, 10],
