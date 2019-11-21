@@ -8,7 +8,6 @@ const location = localStorage.getItem("location")
 export const [useStore] = create((set, get) => ({
   target: [0, 0.5, 0],
   setTarget: target => {
-    console.log({ target });
     set({ target });
   },
   map: undefined,

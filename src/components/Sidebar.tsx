@@ -38,15 +38,15 @@ const Sidebar = () => {
     {
       name: "Unit Width",
       var: "buildingWidth",
-      min: 1,
-      max: 5,
-      step: 1
+      min: 2,
+      max: 4,
+      step: 2
     },
     {
       name: "Unit Length",
       var: "buildingLength",
       min: 1,
-      max: 5,
+      max: 2,
       step: 1
     },
     {
@@ -121,9 +121,6 @@ const Sidebar = () => {
         );
       })}
       <button onClick={addBuilding}>Add Building</button>
-
-      <hr />
-
       <table>
         <tbody>
           <tr>

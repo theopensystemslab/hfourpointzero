@@ -1,7 +1,6 @@
 import intersectionBy from "lodash/intersectionBy";
 import * as React from "react";
 import "react-three-fiber";
-import { useThree } from "react-three-fiber";
 import * as THREE from "three";
 import { isNull } from "util";
 import shallow from "zustand/shallow";
@@ -67,7 +66,6 @@ const lineMaterial = new THREE.LineBasicMaterial({
 
 const Building: React.FC<any> = ({ idx }) => {
   const ref = React.useRef(null);
-  const { camera } = useThree();
 
   const {
     building,
@@ -120,67 +118,69 @@ const Building: React.FC<any> = ({ idx }) => {
   return (
     <>
       <group position={position} rotation={[0, rotation, 0]}>
-        {building.modules.map(([x, y, z]) => {
-          const gridPosition = [
-            x * (grid.size * grid.buildingWidth),
-            y * (grid.size * grid.buildingHeight),
-            z * (grid.size * grid.buildingLength)
-          ];
+        <group>
+          {building.modules.map(([x, y, z]) => {
+            const gridPosition = [
+              x * (grid.size * grid.buildingWidth),
+              y * (grid.size * grid.buildingHeight),
+              z * (grid.size * grid.buildingLength)
+            ];
 
-          return (
-            <React.Fragment key={[x, y, z].join("-")}>
-              <mesh
-                // {...(bind() as any)}
-                position={gridPosition}
-                onClick={e => {
-                  e.stopPropagation();
+            return (
+              <React.Fragment key={[x, y, z].join("-")}>
+                <mesh
+                  // {...(bind() as any)}
+                  position={gridPosition}
+                  onClick={e => {
+                    e.stopPropagation();
 
-                  const now = Date.now();
+                    const now = Date.now();
 
-                  if (now - config.clickTime < 300) {
-                    if (beingEdited) {
-                      focus([0, 0.5, 0]);
+                    if (now - config.clickTime < 300) {
+                      if (beingEdited) {
+                        focus([0, 0.5, 0]);
+                      } else {
+                        focus([position[0], position[1], position[2]]);
+                        // setTarget([position[0], position[1], position[2]]);
+                      }
+
+                      // camera.zoom = 2;
+
+                      setEditing(idx);
                     } else {
-                      focus([position[0], position[1], position[2]]);
-                      // setTarget([position[0], position[1], position[2]]);
+                      if (beingEdited) extrude(e);
                     }
 
-                    // camera.zoom = 2;
-
-                    setEditing(idx);
-                  } else {
-                    if (beingEdited) extrude(e);
-                  }
-
-                  config.clickTime = now;
-                }}
-                ref={ref}
-                onPointerDown={e => {
-                  if (isNull(editing) && !beingEdited) {
-                    config.activeObject = ref.current;
-                    config.changeControls(false);
-                    config.dragging = true;
-                  }
-                }}
-                userData={{
-                  setPosition,
-                  setRotation,
-                  gridPosition: { x, y, z },
-                  addModule: position => {
-                    addModule(idx, position);
-                  }
-                }}
-                geometry={geometry}
-                material={beingEdited ? editMaterial : material}
-                // onPointerOver={e => console.log("hover")}
-                // onPointerOut={e => console.log("unhover")}
-              />
-              <lineSegments position={gridPosition} material={lineMaterial}>
-                <edgesGeometry attach="geometry" args={[geometry]} />
-              </lineSegments>
-            </React.Fragment>
-          );
-        })}
+                    config.clickTime = now;
+                  }}
+                  ref={ref}
+                  onPointerDown={e => {
+                    if (isNull(editing) && !beingEdited) {
+                      config.activeObject = ref.current;
+                      config.changeControls(false);
+                      config.dragging = true;
+                    }
+                  }}
+                  userData={{
+                    setPosition,
+                    setRotation,
+                    gridPosition: { x, y, z },
+                    addModule: position => {
+                      addModule(idx, position);
+                    }
+                  }}
+                  geometry={geometry}
+                  material={beingEdited ? editMaterial : material}
+                  // onPointerOver={e => console.log("hover")}
+                  // onPointerOut={e => console.log("unhover")}
+                />
+                <lineSegments position={gridPosition} material={lineMaterial}>
+                  <edgesGeometry attach="geometry" args={[geometry]} />
+                </lineSegments>
+              </React.Fragment>
+            );
+          })}
+        </group>
 
         {isNull(editing) && (
           <group
@@ -199,7 +199,13 @@ const Building: React.FC<any> = ({ idx }) => {
         {beingEdited && (
           <gridHelper
             args={[20 * grid.size, 20, 0x555555, 0x555555]}
-            position={new THREE.Vector3(0, -grid.size / 2, -grid.size / 2)}
+            position={
+              new THREE.Vector3(
+                0,
+                -grid.size / 2,
+                (-grid.size * grid.buildingLength) / grid.size // + grid.size
+              )
+            }
           />
         )}
       </group>
