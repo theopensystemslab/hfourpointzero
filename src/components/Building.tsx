@@ -59,7 +59,7 @@ const editMaterial = new THREE.MeshBasicMaterial({
 });
 
 const lineMaterial = new THREE.LineBasicMaterial({
-  color: 0xffffff
+  color: 0xeeeeee
   // polygonOffset: true,
   // polygonOffsetUnits: 1,
   // polygonOffsetFactor: 1
