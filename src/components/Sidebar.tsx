@@ -4,7 +4,6 @@ import { useStore } from "../store";
 
 const Sidebar = () => {
   const {
-    buildings,
     area,
     editing,
     setEditing,
@@ -17,7 +16,6 @@ const Sidebar = () => {
     setActiveTab
   } = useStore(
     state => ({
-      buildings: state.buildings,
       area: state.location.area,
       editing: state.editing,
       setEditing: state.setEditing,
@@ -30,6 +28,11 @@ const Sidebar = () => {
       setActiveTab: state.setActiveTab
     }),
     shallow
+  );
+
+  const buildings = useStore(
+    state => state.buildings,
+    (a, b) => JSON.stringify(a) === JSON.stringify(b)
   );
 
   let total = 0;
@@ -76,7 +79,7 @@ const Sidebar = () => {
           <tbody>
             <tr>
               <th>Site Area</th>
-              <td>{area.toFixed(1)}m2</td>
+              <td>{area.toFixed(1)}m²</td>
             </tr>
             <tr>
               <th>Latitude</th>
@@ -207,9 +210,16 @@ const Sidebar = () => {
             <div className="buildings">
               {buildings.map((b, i) => {
                 const footprint =
-                  b.modules.filter(([, y]) => y === 0).length * 4;
-                const cost = b.modules.length * 4 * 1500;
+                  b.modules.filter(([, y]) => y === 0).length *
+                  (grid.size * grid.buildingWidth) *
+                  (grid.size * grid.buildingLength);
 
+                const totalFloorArea =
+                  b.modules.length *
+                  (grid.size * grid.buildingWidth) *
+                  (grid.size * grid.buildingLength);
+
+                const cost = totalFloorArea * 1750;
                 total += cost;
 
                 return (
@@ -240,14 +250,44 @@ const Sidebar = () => {
                           </th>
                         </tr>
                         <tr>
-                          <th>Footprint</th>
-                          <td>{footprint}m2</td>
+                          <th>External Footprint</th>
+                          <td>{footprint.toFixed(2)}m²</td>
+                        </tr>
+                        {Array.from(new Set(b.modules.map(([, y]) => y))).map(
+                          (i: number) => (
+                            <tr>
+                              <th>
+                                {i === 0 ? "Ground floor" : `Floor ${i}`} area
+                              </th>
+                              <td>
+                                {(
+                                  b.modules.filter(([, y]) => y === i).length *
+                                  (grid.size * grid.buildingWidth) *
+                                  (grid.size * grid.buildingLength)
+                                ).toFixed(2)}
+                                m²
+                              </td>
+                            </tr>
+                          )
+                        )}
+                        <tr>
+                          <th>Total floor area</th>
+                          <td>
+                            {totalFloorArea.toFixed(2)}
+                            m²
+                          </td>
                         </tr>
                       </thead>
                       <tbody>
                         <tr>
                           <th>Volume</th>
-                          <td>m3</td>
+                          <td>
+                            {(
+                              totalFloorArea *
+                              (grid.size * grid.buildingHeight)
+                            ).toFixed(2)}
+                            m³
+                          </td>
                         </tr>
                         <tr>
                           <th>Annual Energy Use</th>
@@ -260,7 +300,15 @@ const Sidebar = () => {
                       </tbody>
                       <tfoot>
                         <tr>
-                          <th>Cost</th>
+                          <th>Chassis Cost</th>
+                          <td>€{(totalFloorArea * 466).toLocaleString()}</td>
+                        </tr>
+                        <tr>
+                          <th>Other Costs</th>
+                          <td>€{(totalFloorArea * 1284).toLocaleString()}</td>
+                        </tr>
+                        <tr>
+                          <th>Total Cost</th>
                           <td>€{cost.toLocaleString()}</td>
                         </tr>
                       </tfoot>
