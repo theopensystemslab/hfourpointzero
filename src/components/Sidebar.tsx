@@ -4,32 +4,31 @@ import { useStore } from "../store";
 
 const Sidebar = () => {
   const {
-    area,
-    editing,
-    setEditing,
+    activeTab,
     addBuilding,
+    area,
+    buildings,
+    editing,
     grid,
-    setGrid,
     location,
     removeBuilding,
-    activeTab,
     setActiveTab,
-    cacheBuster,
-    buildings
+    setEditing,
+    setGrid
   } = useStore(
     state => ({
-      area: state.location.area,
-      editing: state.editing,
-      setEditing: state.setEditing,
+      activeTab: state.activeTab,
       addBuilding: state.addBuilding,
+      area: state.location.area,
+      buildings: state.buildings,
+      cacheBuster: state.cacheBuster,
+      editing: state.editing,
       grid: state.grid,
-      setGrid: state.setGrid,
       location: state.location,
       removeBuilding: state.removeBuilding,
-      activeTab: state.activeTab,
       setActiveTab: state.setActiveTab,
-      cacheBuster: state.cacheBuster,
-      buildings: state.buildings
+      setEditing: state.setEditing,
+      setGrid: state.setGrid
     }),
     shallow
   );
@@ -235,7 +234,7 @@ const Sidebar = () => {
                           <th colSpan={2}>
                             <h2 style={{ marginTop: 0 }}>
                               Building {i + 1}
-                              {/* <button
+                              <button
                                 className="remove"
                                 onClick={e => {
                                   e.stopPropagation();
@@ -244,7 +243,7 @@ const Sidebar = () => {
                                 style={{ marginLeft: "1em" }}
                               >
                                 remove
-                              </button> */}
+                              </button>
                             </h2>
                           </th>
                         </tr>
