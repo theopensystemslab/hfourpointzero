@@ -6,7 +6,7 @@ const CircularGrid = ({ size = 3 }) => {
   return (
     <polarGridHelper
       args={[size, 16, 1, 16, 0x555555, 0x555555]}
-      position={new THREE.Vector3(0, 0, 0)}
+      position={new THREE.Vector3(0, -0.1, 0)}
     />
   );
 };

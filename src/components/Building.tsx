@@ -220,7 +220,7 @@ const Building: React.FC<any> = ({ idx }) => {
             position={
               new THREE.Vector3(
                 0,
-                0,
+                -0.1,
                 0
                 // (-grid.size * grid.buildingLength) / grid.size // + grid.size
               )
