@@ -49,11 +49,11 @@ const Sidebar = () => {
       var: "buildingWidth",
       min: 2,
       max: 4,
-      step: 2,
+      step: 1,
       unit: " grid units"
     },
     {
-      name: "Bay Length",
+      name: "Bay Depth",
       var: "buildingLength",
       min: 1,
       max: 2,
