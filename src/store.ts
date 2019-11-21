@@ -3,7 +3,7 @@ import create from "zustand";
 
 const location = localStorage.getItem("location")
   ? JSON.parse(localStorage.getItem("location"))
-  : undefined;
+  : null;
 
 export const [useStore] = create((set, get) => ({
   target: [0, 0.5, 0],
@@ -12,15 +12,15 @@ export const [useStore] = create((set, get) => ({
   },
   activeTab: "add",
   setActiveTab: activeTab => set({ activeTab }),
-  map: undefined,
+  map: null,
   location,
   mode: EditorModes.READ_ONLY,
-  selectedFeatureIndex: undefined,
+  selectedFeatureIndex: null,
   deleteSelected: () => {
     const { selectedFeatureIndex, map } = get();
     if (map && parseInt(selectedFeatureIndex) >= 0) {
       map.deleteFeatures(selectedFeatureIndex);
-      set({ selectedFeatureIndex: undefined });
+      set({ selectedFeatureIndex: null });
     }
   },
   grid: {
@@ -33,7 +33,7 @@ export const [useStore] = create((set, get) => ({
   setGrid: grid => {
     set({ grid });
   },
-  editing: undefined,
+  editing: null,
   buildings: [
     // {
     //   position: [0, 0, 10],
