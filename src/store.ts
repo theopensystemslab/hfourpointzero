@@ -10,6 +10,8 @@ export const [useStore] = create((set, get) => ({
   setTarget: target => {
     set({ target });
   },
+  activeTab: "add",
+  setActiveTab: activeTab => set({ activeTab }),
   map: undefined,
   location,
   mode: EditorModes.READ_ONLY,
@@ -58,6 +60,14 @@ export const [useStore] = create((set, get) => ({
     //   ]
     // }
   ],
+
+  removeBuilding: idx => {
+    const { buildings } = get();
+    // buildings.splice(idx, 1);
+    // set({
+    //   buildings
+    // });
+  },
 
   addBuilding: () => {
     const { buildings } = get();

@@ -63,6 +63,8 @@ const Continue = () => {
   );
 
   const ob = {
+    lat,
+    lng,
     area,
     coordinates: coordinates[0],
     projected: coordinates[0].map(xy => map.project(xy)),

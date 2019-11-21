@@ -54,6 +54,7 @@ h1#place {
   padding: 20px;
   color: white;
   user-select: none;
+  overflow-y: auto;
   /* position: fixed;
   right: 0;
   top: 0;
@@ -73,6 +74,128 @@ h1#place {
   flex: 1;
 }
 
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  text-align: left;
+}
+
+td {
+  text-align: right;
+}
+
 table.active {
   color: limegreen !important;
+}
+table.inactive tbody {
+  display: none;
+}
+
+table.inactive button.remove {
+  display: none;
+}
+
+#site-details {
+  position: fixed;
+  bottom: 20px;
+  right: 320px;
+  pointer-events: none;
+  user-select: none;
+  font-size: 1.2em;
+}
+
+#site-details td {
+  text-align: right;
+}
+
+hr {
+  margin: 1em 0;
+}
+
+#sidebar .buildings table:last-child {
+  margin-bottom: 1em;
+}
+
+.box {
+  border: 1px solid #555;
+  margin: 20px 0;
+  padding: 10px;
+  background: #222;
+}
+
+.buttons > div {
+  cursor: pointer;
+  overflow: hidden;
+}
+.buttons > div:hover h3,
+.buttons > div:active h3 {
+  color: yellow;
+}
+.buttons > div:hover p,
+.buttons > div:active p {
+  color: white;
+}
+.buttons > h3 {
+  transition: color 0.1s;
+}
+.buttons > div img {
+  margin: -5px 10px -5px -5px;
+  width: 65px;
+  height: 65px;
+  float: left;
+}
+.buttons > div div {
+  float: left;
+}
+
+.buttons > div h3,
+.buttons > div p {
+  margin: 0;
+  padding: 0;
+}
+.buttons > div p {
+  margin-top: 0.5em;
+  color: #bbb;
+}
+
+#tabs {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  width: 100%;
+  margin-bottom: 20px;
+}
+#tabs li {
+  flex: 1;
+  text-align: center;
+  color: #777;
+  cursor: pointer;
+  transition: color 0.1s;
+  border-bottom: 1px solid #ccc;
+  padding: 8px 0;
+}
+#tabs li:hover {
+  color: #bbb;
+}
+#tabs li.active {
+  font-weight: bold;
+  color: #fff !important;
+  border: 1px solid #ccc;
+  border-bottom: none !important;
+}
+
+.tab-add > div,
+.tab-info > div,
+.tab-settings > div {
+  display: none;
+}
+
+.tab-add > .buttons,
+.tab-info > .info,
+.tab-settings > .grid {
+  display: block;
 }
