@@ -235,7 +235,7 @@ const Sidebar = () => {
                           <th colSpan={2}>
                             <h2 style={{ marginTop: 0 }}>
                               Building {i + 1}
-                              <button
+                              {/* <button
                                 className="remove"
                                 onClick={e => {
                                   e.stopPropagation();
@@ -244,7 +244,7 @@ const Sidebar = () => {
                                 style={{ marginLeft: "1em" }}
                               >
                                 remove
-                              </button>
+                              </button> */}
                             </h2>
                           </th>
                         </tr>
