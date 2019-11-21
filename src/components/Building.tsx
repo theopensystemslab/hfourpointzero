@@ -40,14 +40,30 @@ const extrude = e => {
   addModule([newPosition.x, newPosition.y, newPosition.z]);
 };
 
-const material = new THREE.MeshBasicMaterial({ color: 0x000000 });
-
-const editMaterial = new THREE.MeshBasicMaterial({
-  color: "limegreen",
-  vertexColors: THREE.FaceColors
+const material = new THREE.MeshBasicMaterial({
+  color: 0x000000,
+  opacity: 0.75,
+  transparent: true,
+  depthTest: true,
+  polygonOffset: true,
+  polygonOffsetFactor: 1, // positive value pushes polygon further away
+  polygonOffsetUnits: 20
 });
 
-const lineMaterial = new THREE.LineBasicMaterial({ color: 0xffffff });
+const editMaterial = new THREE.MeshBasicMaterial({
+  color: 0xaaaaaa,
+  vertexColors: THREE.FaceColors,
+  polygonOffset: true,
+  polygonOffsetFactor: 1, // positive value pushes polygon further away
+  polygonOffsetUnits: 20
+});
+
+const lineMaterial = new THREE.LineBasicMaterial({
+  color: 0xffffff
+  // polygonOffset: true,
+  // polygonOffsetUnits: 1,
+  // polygonOffsetFactor: 1
+});
 
 const Building: React.FC<any> = ({ idx }) => {
   const ref = React.useRef(null);

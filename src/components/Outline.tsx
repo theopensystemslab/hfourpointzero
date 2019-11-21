@@ -88,7 +88,7 @@ const Outline: React.FC = () => {
       </line>
 
       <line>
-        <lineBasicMaterial attach="material" color={0xcccccc} />
+        <lineBasicMaterial attach="material" color={0x3a3a3a} />
         <geometry attach="geometry" vertices={inner} />
       </line>
     </>
