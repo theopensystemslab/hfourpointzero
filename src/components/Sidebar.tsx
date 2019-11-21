@@ -48,21 +48,24 @@ const Sidebar = () => {
       var: "buildingWidth",
       min: 2,
       max: 4,
-      step: 2
+      step: 2,
+      unit: " grid units"
     },
     {
       name: "Bay Length",
       var: "buildingLength",
       min: 1,
       max: 2,
-      step: 1
+      step: 1,
+      unit: " grid units"
     },
     {
       name: "Bay Height",
       var: "buildingHeight",
       min: 2,
       max: 3,
-      step: 0.1
+      step: 0.1,
+      unit: " grid units"
     }
   ];
 
@@ -110,21 +113,85 @@ const Sidebar = () => {
 
         <div className={`tab-${activeTab}`}>
           <div className="buttons">
-            <div onClick={addBuilding} className="box">
+            <div
+              onClick={() =>
+                addBuilding([
+                  [0, 0, -2],
+                  [0, 0, -1],
+                  [0, 0, 0],
+                  [0, 0, 1],
+                  [0, 0, 2]
+                ])
+              }
+              className="box"
+            >
               <img src="a.png" />
               <div className="info">
                 <h3>Type A</h3>
                 <p>1 storey microhome</p>
               </div>
             </div>
-            <div className="box">
+
+            <div
+              className="box"
+              onClick={() =>
+                addBuilding([
+                  [0, 0, -2],
+                  [0, 0, -1],
+                  [0, 0, 0],
+                  [0, 0, 1],
+                  [0, 0, 2],
+                  [0, 1, -2],
+                  [0, 1, -1],
+                  [0, 1, 0],
+                  [0, 1, 1],
+                  [0, 1, 2]
+                ])
+              }
+            >
               <img src="b.png" />
               <div className="info">
                 <h3>Type B</h3>
                 <p>2 storey home</p>
               </div>
             </div>
-            <div className="box">
+
+            <div
+              className="box"
+              onClick={() =>
+                addBuilding([
+                  [0, 0, -2],
+                  [0, 0, -1],
+                  [0, 0, 0],
+                  [0, 0, 1],
+                  [0, 0, 2],
+                  [-1, 0, 1],
+                  [-1, 0, 2],
+                  [1, 0, -1],
+                  [1, 0, 0],
+                  [1, 0, 1],
+                  [-1, 0, -1],
+                  [-1, 0, -2],
+                  [0, 1, -2],
+                  [0, 1, -1],
+                  [0, 1, 0],
+                  [0, 1, 1],
+                  [0, 1, 2],
+                  [-1, 1, 1],
+                  [-1, 1, 2],
+                  [1, 1, -1],
+                  [1, 1, 0],
+                  [1, 1, 1],
+                  [-1, 1, -1],
+                  [-1, 1, -2],
+                  [0, 2, -2],
+                  [0, 2, -1],
+                  [0, 2, 0],
+                  [0, 2, 1],
+                  [0, 2, 2]
+                ])
+              }
+            >
               <img src="c.png" />
               <div className="info">
                 <h3>Type C</h3>
@@ -203,7 +270,7 @@ const Sidebar = () => {
               })}
             </div>
 
-            <table>
+            <table style={{ fontSize: "1.5em" }}>
               <tbody>
                 <tr>
                   <th>Total</th>

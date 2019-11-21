@@ -69,14 +69,14 @@ export const [useStore] = create((set, get) => ({
     // });
   },
 
-  addBuilding: () => {
+  addBuilding: (modules = [[0, 0, 0]]) => {
     const { buildings } = get();
     set({
       buildings: [
         ...buildings,
         {
           position: [0, 0, 0],
-          modules: [[0, 0, 0]]
+          modules
         }
       ]
     });

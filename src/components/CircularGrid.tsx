@@ -4,7 +4,6 @@ import * as THREE from "three";
 
 const CircularGrid = () => {
   const size = 3;
-  return null;
   return (
     <polarGridHelper
       args={[size, 16, size - 1, 16, 0x555555, 0x555555]}
