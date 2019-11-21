@@ -11,6 +11,7 @@ import { config } from "./_vars";
 
 const extrude = e => {
   // return;
+
   if (!e.face) return;
 
   const geometry = (e.eventObject as THREE.Mesh).geometry as THREE.Geometry;
@@ -47,7 +48,10 @@ const geometry = new THREE.BoxGeometry(
 
 const material = new THREE.MeshBasicMaterial({ color: 0x000000 });
 
-const editMaterial = new THREE.MeshBasicMaterial({ color: "limegreen" });
+const editMaterial = new THREE.MeshBasicMaterial({
+  color: "limegreen",
+  vertexColors: THREE.FaceColors
+});
 
 const lineMaterial = new THREE.LineBasicMaterial({ color: 0xffffff });
 
@@ -111,7 +115,7 @@ const Building: React.FC<any> = ({ idx }) => {
 
                   const now = Date.now();
 
-                  if (now - config.clickTime < 250) {
+                  if (now - config.clickTime < 300) {
                     if (beingEdited) {
                       focus([0, 0.5, 0]);
                     } else {
@@ -123,9 +127,7 @@ const Building: React.FC<any> = ({ idx }) => {
 
                     setEditing(idx);
                   } else {
-                    if (beingEdited) {
-                      extrude(e);
-                    }
+                    if (beingEdited) extrude(e);
                   }
 
                   config.clickTime = now;

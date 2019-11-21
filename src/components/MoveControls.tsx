@@ -14,10 +14,11 @@ const MoveControls = () => {
     let mouse = new THREE.Vector2();
     var intersects = new THREE.Vector3();
     var plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+    let intersections = [];
     // const raycaster = new THREE.Raycaster();
 
     function onMouseMove(event) {
-      if (!config.dragging && !config.rotating) return;
+      if (!config.dragging && !config.rotating && !config.activeObject) return;
 
       mouse.set(
         (event.clientX / gl.domElement.width) * 2 - 1,
@@ -57,6 +58,7 @@ const MoveControls = () => {
         config.activeObject.userData.setRotation(
           config.initialRotation + mouse.x * 4
         );
+      } else {
       }
     }
 

@@ -3,12 +3,13 @@ import shallow from "zustand/shallow";
 import { useStore } from "../store";
 
 const Sidebar = () => {
-  const { buildings, area, editing, setEditing } = useStore(
+  const { buildings, area, editing, setEditing, addBuilding } = useStore(
     state => ({
       buildings: state.buildings,
       area: state.location.area,
       editing: state.editing,
-      setEditing: state.setEditing
+      setEditing: state.setEditing,
+      addBuilding: state.addBuilding
     }),
     shallow
   );
@@ -54,6 +55,7 @@ const Sidebar = () => {
           </table>
         );
       })}
+      <button onClick={addBuilding}>Add Building</button>
       <table>
         <tbody>
           <tr>

@@ -1,5 +1,6 @@
-import { centroid, polygon } from "@turf/turf";
+import { polygon } from "@turf/turf";
 import ClipperLib from "clipper-fpoint";
+import polylabel from "polylabel";
 import * as React from "react";
 import * as THREE from "three";
 import { useStore } from "../store";
@@ -25,7 +26,8 @@ const Outline: React.FC = () => {
     // const halfX = (maxX - minX) / 2;
     // const halfY = (maxY - minY) / 2;
 
-    const c = centroid(polygon([projected])).geometry.coordinates;
+    // const c = centroid(polygon([projected])).geometry.coordinates;
+    const c = polylabel([projected], 1.0, false);
 
     const mpp = metersPerPixel(coordinates[0][0], zoom + 1);
 

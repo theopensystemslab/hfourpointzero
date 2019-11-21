@@ -24,31 +24,44 @@ export const [useStore] = create((set, get) => ({
   },
   editing: 1,
   buildings: [
-    {
-      position: [0, 0, 10],
-      modules: [
-        [0, 0, 0],
-        [0, 1, 0],
-        [0, 0, 1],
-        [0, 0, -1],
-        [0, 1, -1],
-        [-1, 0, -1],
-        [-1, 0, 0],
-        [1, 0, -1],
-        [1, 0, 0]
-      ]
-    },
-    {
-      position: [0, 0, 0],
-      modules: [
-        [0, 0, 0],
-        [0, 0, 1],
-        [0, 0, -1],
-        [0, 0, 2],
-        [0, 0, -2]
-      ]
-    }
+    // {
+    //   position: [0, 0, 10],
+    //   modules: [
+    //     [0, 0, 0],
+    //     [0, 1, 0],
+    //     [0, 0, 1],
+    //     [0, 0, -1],
+    //     [0, 1, -1],
+    //     [-1, 0, -1],
+    //     [-1, 0, 0],
+    //     [1, 0, -1],
+    //     [1, 0, 0]
+    //   ]
+    // },
+    // {
+    //   position: [0, 0, 0],
+    //   modules: [
+    //     [0, 0, 0],
+    //     [0, 0, 1],
+    //     [0, 0, -1],
+    //     [0, 0, 2],
+    //     [0, 0, -2]
+    //   ]
+    // }
   ],
+
+  addBuilding: () => {
+    const { buildings } = get();
+    set({
+      buildings: [
+        ...buildings,
+        {
+          position: [0, 0, 0],
+          modules: [[0, 0, 0]]
+        }
+      ]
+    });
+  },
 
   addModule: (idx, position) => {
     const { buildings } = get();
@@ -57,6 +70,12 @@ export const [useStore] = create((set, get) => ({
     ) {
       // set({ buildings: {...buildings} })
       // set([...modules, position]);
+      buildings[idx] = {
+        ...buildings[idx],
+        modules: [...buildings[idx].modules, position]
+      };
+
+      set({ buildings });
     }
   },
 
