@@ -125,6 +125,10 @@ hr {
   margin: 20px 0;
   padding: 10px;
   background: #222;
+  transition: background 0.1s;
+}
+.box:hover {
+  background: #2a2a2a;
 }
 
 .buttons > div {

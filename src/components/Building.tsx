@@ -216,12 +216,13 @@ const Building: React.FC<any> = ({ idx }) => {
 
         {beingEdited && (
           <gridHelper
-            args={[20 * grid.size, 20, 0x555555, 0x555555]}
+            args={[20 * grid.size, 40, 0x555555, 0x555555]}
             position={
               new THREE.Vector3(
                 0,
                 0,
-                (-grid.size * grid.buildingLength) / grid.size // + grid.size
+                0
+                // (-grid.size * grid.buildingLength) / grid.size // + grid.size
               )
             }
           />
