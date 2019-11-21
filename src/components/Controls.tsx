@@ -29,7 +29,7 @@ const Controls: React.FC = () => {
       zoomSpeed={0.8}
       target={target}
       // minPolarAngle={0.5}
-      maxPolarAngle={1.2}
+      maxPolarAngle={1.49}
       enabled={enabled}
       minDistance={4}
       maxDistance={50}

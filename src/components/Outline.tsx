@@ -3,7 +3,6 @@ import ClipperLib from "clipper-fpoint";
 import polylabel from "polylabel";
 import * as React from "react";
 import * as THREE from "three";
-import shallow from "zustand/shallow";
 import { useStore } from "../store";
 import { config } from "./_vars";
 
@@ -18,13 +17,7 @@ const metersPerPixel = function(latitude, zoomLevel) {
 };
 
 const Outline: React.FC = () => {
-  const {
-    location: { coordinates, zoom, projected },
-    grid
-  } = useStore(
-    state => ({ location: state.location, grid: state.grid }),
-    shallow
-  );
+  const { coordinates, zoom, projected } = useStore(state => state.location);
 
   const [outer, inner] = React.useMemo(() => {
     // const poly = polygon([coordinates]);
@@ -70,12 +63,10 @@ const Outline: React.FC = () => {
     return [
       cartesian.map(
         // const vertices = [...shape, shape[0]].map(
-        ([x, z]) =>
-          new THREE.Vector3(x, (-grid.buildingHeight * grid.size) / 2, z)
+        ([x, z]) => new THREE.Vector3(x, 0, z)
       ),
       [...solution[0], solution[0][0]].map(
-        ({ X, Y }) =>
-          new THREE.Vector3(X, (-grid.buildingHeight * grid.size) / 2, Y)
+        ({ X, Y }) => new THREE.Vector3(X, 0, Y)
       )
     ];
   }, [coordinates]);

@@ -105,15 +105,15 @@ const Building: React.FC<any> = ({ idx }) => {
     }
   };
 
-  const geometry = React.useMemo(
-    () =>
-      new THREE.BoxGeometry(
-        grid.size * grid.buildingWidth,
-        grid.size * grid.buildingHeight,
-        grid.size * grid.buildingLength
-      ),
-    [grid]
-  );
+  const geometry = React.useMemo(() => {
+    const g = new THREE.BoxGeometry(
+      grid.size * grid.buildingWidth,
+      grid.size * grid.buildingHeight,
+      grid.size * grid.buildingLength
+    );
+    g.translate(0, (grid.size * grid.buildingHeight) / 2, 0);
+    return g;
+  }, [grid]);
 
   const ob = building.modules
     .filter(([x, y, z]) => y === 0)
@@ -156,7 +156,7 @@ const Building: React.FC<any> = ({ idx }) => {
 
                     if (now - config.clickTime < 300) {
                       if (beingEdited) {
-                        focus([0, 0.5, 0]);
+                        focus([0, grid.buildingHeight, 0]);
                       } else {
                         focus([position[0], position[1], position[2]]);
                         // setTarget([position[0], position[1], position[2]]);
@@ -220,7 +220,7 @@ const Building: React.FC<any> = ({ idx }) => {
             position={
               new THREE.Vector3(
                 0,
-                -grid.size / 2,
+                0,
                 (-grid.size * grid.buildingLength) / grid.size // + grid.size
               )
             }
