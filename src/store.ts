@@ -104,6 +104,17 @@ export const [useStore] = create((set, get) => ({
     }
   },
 
+  removeModule: (idx, position) => {
+    const { buildings } = get();
+    buildings[idx] = {
+      ...buildings[idx],
+      modules: buildings[idx].modules.filter(m => {
+        return m.toString() !== Object.values(position).toString();
+      })
+    };
+    set({ buildings, cacheBuster: Math.random() });
+  },
+
   // setViewport: viewport => set({ viewport }),
   setEditing: idx => {
     set({ editing: get().editing === idx ? null : idx });

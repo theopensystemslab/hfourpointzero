@@ -8,10 +8,18 @@ import { useStore } from "../store";
 import CircularGrid from "./CircularGrid";
 import { config } from "./_vars";
 
-const extrude = e => {
-  // return;
+// const planeGeometry = new THREE.PlaneGeometry(3, 3, 1, 1);
+// const planeMaterial = new THREE.MeshBasicMaterial({
+//   color: "red",
+//   side: THREE.DoubleSide
+// });
 
+const extrude = e => {
   if (!e.face) return;
+
+  const { gridPosition, addModule, removeModule } = e.eventObject.userData;
+
+  if (config.shiftDown) return removeModule(gridPosition);
 
   const geometry = (e.eventObject as THREE.Mesh).geometry as THREE.Geometry;
 
@@ -27,8 +35,6 @@ const extrude = e => {
     return acc;
   }, "");
 
-  const { gridPosition, addModule } = e.eventObject.userData;
-
   const newPosition = { ...gridPosition };
 
   if (v[e.face.a][common] > 0) {
@@ -41,7 +47,7 @@ const extrude = e => {
 
 const material = new THREE.MeshBasicMaterial({
   color: 0x000000,
-  opacity: 0.65,
+  opacity: 0.7,
   transparent: true,
   // depthTest: true,
   polygonOffset: true,
@@ -66,10 +72,12 @@ const lineMaterial = new THREE.LineBasicMaterial({
 
 const Building: React.FC<any> = ({ idx }) => {
   const ref = React.useRef(null);
+  // const planeRef = React.useRef(null);
 
   const {
     building,
     addModule,
+    removeModule,
     editing,
     setEditing,
     setTarget,
@@ -79,6 +87,7 @@ const Building: React.FC<any> = ({ idx }) => {
     state => ({
       building: state.buildings[idx],
       addModule: state.addModule,
+      removeModule: state.removeModule,
       editing: state.editing,
       setEditing: state.setEditing,
       setTarget: state.setTarget,
@@ -135,6 +144,7 @@ const Building: React.FC<any> = ({ idx }) => {
 
   return (
     <>
+      {/* <mesh ref={planeRef} geometry={planeGeometry} material={planeMaterial} /> */}
       <group position={position} rotation={[0, rotation, 0]}>
         <group>
           {building.modules.map(([x, y, z]) => {
@@ -156,15 +166,14 @@ const Building: React.FC<any> = ({ idx }) => {
 
                     if (now - config.clickTime < 300) {
                       if (beingEdited) {
-                        focus([0, grid.buildingHeight, 0]);
+                        // focus([0, grid.buildingHeight, 0]);
+                        // setEditing(null);
                       } else {
                         focus([position[0], position[1], position[2]]);
+                        setEditing(idx);
                         // setTarget([position[0], position[1], position[2]]);
                       }
-
                       // camera.zoom = 2;
-
-                      setEditing(idx);
                     } else {
                       if (beingEdited) extrude(e);
                     }
@@ -172,11 +181,49 @@ const Building: React.FC<any> = ({ idx }) => {
                     config.clickTime = now;
                   }}
                   ref={ref}
+                  onPointerOver={() => {
+                    if (!config.dragging && !config.rotating) {
+                      config.activeObject = ref.current;
+                    }
+                  }}
                   onPointerDown={e => {
+                    e.stopPropagation();
                     if (isNull(editing) && !beingEdited) {
                       config.activeObject = ref.current;
                       config.changeControls(false);
                       config.dragging = true;
+                    } else if (beingEdited) {
+                      config.changeControls(false);
+                      config.extruding = true;
+
+                      // config.plane = planeRef.current;
+
+                      // if (!config.plane.userData.pts) {
+                      //   config.plane.userData.pts = () => {
+                      //     config.plane.updateMatrixWorld(true);
+                      //     return [
+                      //       config.plane.position,
+                      //       config.plane.localToWorld(
+                      //         new THREE.Vector3(0, 0, 1)
+                      //       ),
+                      //       config.plane.localToWorld(
+                      //         new THREE.Vector3(0, 1, 0)
+                      //       )
+                      //     ];
+                      //   };
+                      // }
+
+                      // planeRef.current.position.set(new THREE.Vector3(0, 0, 0));
+
+                      // if (e.face.normal.z !== 0) {
+                      //   planeRef.current.rotation.y = Math.PI / 2;
+                      // } else {
+                      //   planeRef.current.rotation.y = 0;
+                      // }
+
+                      // planeRef.current.position.copy(
+                      //   new THREE.Vector3(e.point.x, e.point.y, e.point.z)
+                      // );
                     }
                   }}
                   userData={{
@@ -185,6 +232,10 @@ const Building: React.FC<any> = ({ idx }) => {
                     gridPosition: { x, y, z },
                     addModule: position => {
                       addModule(idx, position);
+                    },
+                    removeModule: position => {
+                      config.activeObject = null;
+                      removeModule(idx, position);
                     }
                   }}
                   geometry={geometry}
