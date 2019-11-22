@@ -1,7 +1,7 @@
 export const config = {
   plane: undefined,
   shiftDown: false,
-  extruding: false,
+  // extruding: false,
   dragging: false,
   outline: undefined,
   rotating: false,

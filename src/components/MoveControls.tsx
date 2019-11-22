@@ -119,17 +119,17 @@ const MoveControls = () => {
 
     function onMouseUp() {
       config.changeControls(true);
-      config.extruding = false;
+      // config.extruding = false;
       config.dragging = false;
       config.rotating = false;
       mouseDown = false;
 
-      if (config.activeObject) {
-        config.activeObject.geometry.faces.forEach(f => {
-          f.color.setHex(0xaaaaaa);
-        });
-        config.activeObject.geometry.colorsNeedUpdate = true;
-      }
+      // if (config.activeObject) {
+      //   config.activeObject.geometry.faces.forEach(f => {
+      //     f.color.setHex(0xaaaaaa);
+      //   });
+      //   config.activeObject.geometry.colorsNeedUpdate = true;
+      // }
     }
 
     function onMouseDown() {

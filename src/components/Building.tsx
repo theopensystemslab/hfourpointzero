@@ -194,7 +194,7 @@ const Building: React.FC<any> = ({ idx }) => {
                       config.dragging = true;
                     } else if (beingEdited) {
                       config.changeControls(false);
-                      config.extruding = true;
+                      // config.extruding = true;
 
                       // config.plane = planeRef.current;
 

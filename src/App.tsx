@@ -14,6 +14,8 @@ const App: React.FC = () => {
   const handleKeyUp = e => {
     e.stopPropagation();
     if (e.key === "Escape") {
+      config.changeControls(true);
+      // config.extruding = false;
       setEditing(null);
     }
     if (e.key === "Shift") {
